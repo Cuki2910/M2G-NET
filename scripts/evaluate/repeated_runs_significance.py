@@ -1,6 +1,6 @@
 """
 Phase 9: Repeated Runs and Statistical Significance Testing
-This script runs the TG-MVMT-GFNet and a baseline (XGBoost) for multiple 
+This script runs the M2G-Net and a baseline (XGBoost) for multiple 
 random seeds to compute means, 95% Confidence Intervals, and a paired t-test.
 """
 
@@ -27,6 +27,9 @@ def set_random_seed(seed):
 def compute_ci(data, confidence=0.95):
     a = 1.0 * np.array(data)
     n = len(a)
+    if n < 2:
+        m = float(np.mean(a)) if n else float("nan")
+        return m, m, m
     m, se = np.mean(a), stats.sem(a)
     h = se * stats.t.ppf((1 + confidence) / 2., n-1)
     return m, m-h, m+h
@@ -38,22 +41,23 @@ def main():
     gfnet_aucs = []
     baseline_aucs = []
     
-    train_df, val_df, test_df, encoders, vocab = load_data()
-    trainval_df = pd.concat([train_df, val_df]).reset_index(drop=True)
-    
     print(f"Starting repeated runs ({n_runs} runs)...")
     
     for i, seed in enumerate(seeds):
         print(f"\n--- Run {i+1}/{n_runs} (Seed: {seed}) ---")
         set_random_seed(seed)
+        train_df, val_df, test_df, encoders, vocab = load_data(seed=seed)
+        trainval_df = pd.concat([train_df, val_df]).reset_index(drop=True)
         
         # 1. Train GFNet
-        print("Training TG-MVMT-GFNet...")
+        print("Training M2G-Net...")
         # Train using the default epochs and patience
         model, loss_fn, test_metrics, history = train(
             vocab, train_df, val_df, test_df, 
             max_epochs=cfg.MAX_EPOCHS, 
-            patience=cfg.EARLY_STOPPING_PATIENCE
+            patience=cfg.EARLY_STOPPING_PATIENCE,
+            encoders=encoders,
+            split_seed=seed,
         )
         gfnet_auc = test_metrics["macro"]["roc_auc"]
         gfnet_aucs.append(gfnet_auc)
@@ -80,7 +84,7 @@ def main():
     
     # GFNet stats
     m_gf, lower_gf, upper_gf = compute_ci(gfnet_aucs)
-    print(f"TG-MVMT-GFNet Macro ROC-AUC : {m_gf:.4f} (95% CI: [{lower_gf:.4f}, {upper_gf:.4f}])")
+    print(f"M2G-Net Macro ROC-AUC : {m_gf:.4f} (95% CI: [{lower_gf:.4f}, {upper_gf:.4f}])")
     
     # Baseline stats
     m_bs, lower_bs, upper_bs = compute_ci(baseline_aucs)

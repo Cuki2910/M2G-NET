@@ -12,6 +12,14 @@ from sklearn.metrics import (
 import config as cfg
 
 
+def safe_nanmean(values):
+    values = np.asarray(values, dtype=float)
+    finite = values[np.isfinite(values)]
+    if finite.size == 0:
+        return float("nan")
+    return float(finite.mean())
+
+
 def expected_calibration_error(y_true, y_prob, n_bins=10):
     bins = np.linspace(0.0, 1.0, n_bins + 1)
     ece = 0.0
@@ -60,7 +68,15 @@ def compute_task_metrics(y_true, y_prob, threshold=0.5):
     return metrics
 
 
-def compute_all_metrics(all_targets, all_probs, all_masks=None):
+def _threshold_for_task(thresholds, task, task_idx):
+    if thresholds is None:
+        return 0.5
+    if isinstance(thresholds, dict):
+        return float(thresholds.get(task, 0.5))
+    return float(thresholds[task_idx])
+
+
+def compute_all_metrics(all_targets, all_probs, all_masks=None, thresholds=None):
     """
     all_targets: (N, num_tasks) numpy array
     all_probs:   (N, num_tasks) numpy array
@@ -85,14 +101,52 @@ def compute_all_metrics(all_targets, all_probs, all_masks=None):
                 "specificity": float("nan"),
             }
         else:
-            results[task] = compute_task_metrics(all_targets[observed, k], all_probs[observed, k])
+            threshold = _threshold_for_task(thresholds, task, k)
+            results[task] = compute_task_metrics(
+                all_targets[observed, k], all_probs[observed, k],
+                threshold=threshold,
+            )
 
     # Macro average
     results["macro"] = {
-        m: np.nanmean([results[t][m] for t in cfg.TASK_NAMES])
+        m: safe_nanmean([results[t][m] for t in cfg.TASK_NAMES])
         for m in ["roc_auc", "pr_auc", "f1", "balanced_acc", "brier", "ece", "sensitivity", "specificity"]
     }
     return results
+
+
+def tune_task_thresholds(all_targets, all_probs, all_masks=None, metric="f1",
+                         grid=None):
+    """
+    Select one threshold per task on validation predictions.
+    Returns a dict {task_name: threshold}. ROC/PR metrics remain threshold-free;
+    these thresholds only affect decision metrics such as F1 and balanced accuracy.
+    """
+    if all_masks is None:
+        all_masks = np.ones_like(all_targets, dtype=float)
+    if grid is None:
+        grid = np.linspace(0.01, 0.99, 99)
+
+    thresholds = {}
+    for k, task in enumerate(cfg.TASK_NAMES):
+        observed = all_masks[:, k].astype(bool)
+        y_true = all_targets[observed, k]
+        y_prob = all_probs[observed, k]
+        if len(np.unique(y_true)) < 2:
+            thresholds[task] = 0.5
+            continue
+
+        scores = []
+        for threshold in grid:
+            y_pred = (y_prob >= threshold).astype(int)
+            if metric == "balanced_acc":
+                score = balanced_accuracy_score(y_true, y_pred)
+            else:
+                score = f1_score(y_true, y_pred, zero_division=0)
+            scores.append(score)
+        thresholds[task] = float(grid[int(np.argmax(scores))])
+
+    return thresholds
 
 
 def mtl_transfer_ratio(mtl_results, single_results):

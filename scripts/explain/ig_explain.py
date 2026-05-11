@@ -24,23 +24,12 @@ except ImportError:
     print("Warning: captum not installed. Install with: pip install captum")
 
 import config as cfg
-from src.data_pipeline import load_data, get_loaders
-from src.model import TGMVMTGFNetV2
-from src.loss  import UncertaintyWeightedLoss
+from src.checkpoint import load_model_bundle
+from src.data_pipeline import get_loaders
 
 os.makedirs("outputs", exist_ok=True)
 
 VIEW_LABELS = ["Rider Role", "Rider Traits", "Road Context", "Environment", "Site"]
-
-
-def load_best_model(vocab):
-    model   = TGMVMTGFNetV2(vocab)
-    loss_fn = UncertaintyWeightedLoss()
-    ckpt    = torch.load(cfg.CHECKPOINT_PATH, weights_only=False)
-    model.load_state_dict(ckpt["model_state"])
-    loss_fn.load_state_dict(ckpt["loss_state"])
-    model.eval()
-    return model, loss_fn
 
 
 # ── Wrapper for task-specific prediction ─────────────────────────────────────
@@ -92,7 +81,7 @@ def compute_ig_per_view_gradient(model, loader, task_idx, n_samples=200):
     Fallback: Approximate IG by computing gradient × activation for each view encoder's output.
     Returns avg absolute attribution per view: shape (5,)
     """
-    model.train()   # allow gradients through dropout
+    model.eval()
     view_grads = [[] for _ in range(5)]  # 5 views
     view_names = ["rider_role", "rider_traits", "road_context", "environment", "site"]
 
@@ -113,15 +102,13 @@ def compute_ig_per_view_gradient(model, loader, task_idx, n_samples=200):
                 def hook_forward(module, inp, out):
                     out = out.detach().requires_grad_(True)
                     outputs[vn] = out
+                    out.register_hook(lambda grad: grads_out.__setitem__(vn, grad.detach()))
                     return out
-                def hook_backward(module, grad_in, grad_out):
-                    grads_out[vn] = grad_out[0].detach()
-                return hook_forward, hook_backward
+                return hook_forward
 
-            fh, bh = make_hook(v_idx, vname)
+            fh = make_hook(v_idx, vname)
             h1 = model.encoders[vname].register_forward_hook(fh)
-            h2 = model.encoders[vname].register_full_backward_hook(bh)
-            handles.extend([h1, h2])
+            handles.append(h1)
 
         # Forward pass
         preds, _, _ = model(views)
@@ -195,14 +182,16 @@ def plot_ig_comparison(gate_weights, ig_attrs):
 
 
 if __name__ == "__main__":
-    train_df, val_df, test_df, encoders, vocab = load_data()
+    bundle = load_model_bundle()
+    train_df, val_df, test_df = bundle["train_df"], bundle["val_df"], bundle["test_df"]
+    vocab = bundle["vocab"]
     _, _, test_loader = get_loaders(train_df, val_df, test_df, vocab)
-    model, loss_fn = load_best_model(vocab)
+    model = bundle["model"]
 
     # Collect avg gate weights (same as interpret.py)
     all_gates = [[] for _ in range(cfg.NUM_TASKS)]
     with torch.no_grad():
-        for views, _ in test_loader:
+        for views, _, _ in test_loader:
             _, gate_weights, _ = model(views)
             for k, gw in enumerate(gate_weights):
                 all_gates[k].append(gw[:, :5].numpy())

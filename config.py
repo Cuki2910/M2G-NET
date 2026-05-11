@@ -1,5 +1,5 @@
 """
-TG-MVMT-GFNet v2 — Central Configuration
+M2G-Net v2 — Central Configuration
 All hyperparameters and column mappings are defined here.
 """
 
@@ -66,7 +66,7 @@ INTERACTION_DIM = 16  # output dim of h_inter
 NUM_GATE_INPUTS       = 6       # 5 views + 1 interaction term
 TEMPERATURE_INIT      = 2.0     # annealed → 1.0 over training
 TEMPERATURE_FINAL     = 1.0
-GATE_PRIOR_WEIGHT     = 1.0     # lambda for the uniform gate-logit prior
+GATE_PRIOR_WEIGHT     = 0.1     # lambda for post-softmax uniform prior smoothing
 
 # ── Training ──────────────────────────────────────────────────────────────────
 LEARNING_RATE          = 1e-3
@@ -78,7 +78,8 @@ CHECKPOINT_PATH        = "checkpoints/best_model.pt"
 
 # ── Loss ──────────────────────────────────────────────────────────────────────
 USE_UNCERTAINTY_WEIGHTING = True
-USE_FOCAL_LOSS            = False
+USE_POS_WEIGHT             = False
+USE_FOCAL_LOSS            = True
 FOCAL_ALPHA               = 0.25
 FOCAL_GAMMA               = 2.0
 

@@ -9,10 +9,9 @@ import torch
 from torch.utils.data import DataLoader
 
 import config as cfg
-from src.data_pipeline import load_data, RiderDataset
+from src.checkpoint import load_model_bundle
+from src.data_pipeline import RiderDataset
 from src.metrics import compute_all_metrics
-from src.model import TGMVMTGFNetV2
-from src.loss import UncertaintyWeightedLoss
 
 
 os.makedirs("outputs", exist_ok=True)
@@ -29,7 +28,7 @@ def collect_predictions(model, loader):
     return np.vstack(all_targets), np.vstack(all_probs), np.vstack(all_masks)
 
 
-def subgroup_rows(df, y, p, m, column, encoders):
+def subgroup_rows(df, y, p, m, column, encoders, thresholds=None):
     rows = []
     values = sorted(df[column].dropna().unique())
     for value in values:
@@ -41,7 +40,7 @@ def subgroup_rows(df, y, p, m, column, encoders):
         if column in encoders:
             label = encoders[column].inverse_transform([int(value)])[0]
 
-        metrics = compute_all_metrics(y[mask], p[mask], m[mask])
+        metrics = compute_all_metrics(y[mask], p[mask], m[mask], thresholds=thresholds)
         for task in cfg.TASK_NAMES + ["macro"]:
             row = {
                 "group_variable": column,
@@ -55,28 +54,26 @@ def subgroup_rows(df, y, p, m, column, encoders):
 
 
 def main():
-    train_df, val_df, test_df, encoders, vocab = load_data()
+    bundle = load_model_bundle()
+    test_df = bundle["test_df"]
+    encoders = bundle["encoders"]
+    vocab = bundle["vocab"]
+    thresholds = bundle["thresholds"]
     test_loader = DataLoader(RiderDataset(test_df, vocab), batch_size=cfg.BATCH_SIZE, shuffle=False)
-
-    model = TGMVMTGFNetV2(vocab)
-    loss_fn = UncertaintyWeightedLoss()
-    ckpt = torch.load(cfg.CHECKPOINT_PATH, weights_only=False)
-    model.load_state_dict(ckpt["model_state"])
-    loss_fn.load_state_dict(ckpt["loss_state"])
-    model.eval()
+    model = bundle["model"]
 
     y, p, m = collect_predictions(model, test_loader)
 
     rows = []
     for column in ["gender", "age_group"]:
         if column in test_df.columns:
-            rows.extend(subgroup_rows(test_df, y, p, m, column, encoders))
+            rows.extend(subgroup_rows(test_df, y, p, m, column, encoders, thresholds=thresholds))
 
     result = pd.DataFrame(rows)
     out = "outputs/fairness_calibration_by_group.csv"
     result.to_csv(out, index=False)
 
-    overall = compute_all_metrics(y, p, m)
+    overall = compute_all_metrics(y, p, m, thresholds=thresholds)
     overall_rows = []
     for task in cfg.TASK_NAMES + ["macro"]:
         row = {"task": task}

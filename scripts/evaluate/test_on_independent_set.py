@@ -3,7 +3,7 @@ sys.path.insert(0, "..")
 
 """
 Test model on independent test set
-Evaluates TG-MVMT-GFNet v2 on the configured independent test CSV.
+Evaluates M2G-Net v2 on the configured independent test CSV.
 When the repository uses synthetic CSVs, this should be interpreted as a
 synthetic out-of-site test rather than external real-world validation.
 """
@@ -16,9 +16,8 @@ import numpy as np
 import torch
 
 import config as cfg
-from src.data_pipeline import RiderDataset
-from src.model import TGMVMTGFNetV2
-from src.loss import UncertaintyWeightedLoss
+from src.checkpoint import load_model_bundle
+from src.data_pipeline import RiderDataset, encode_with_preprocessing
 from src.metrics import compute_all_metrics, print_results
 from torch.utils.data import DataLoader
 
@@ -35,78 +34,50 @@ def load_independent_test_set():
     return df
 
 
-def build_vocab_for_test(test_df, train_vocab):
+def report_site_coverage(test_df, train_vocab):
     """
-    Build vocab for test set, handling unseen intersections.
-    For unseen site_ids, we'll map them to the last training site (31).
+    Report independent-site coverage using the train-time site mapping.
     """
-    vocab = train_vocab.copy()
-
-    # Check for unseen intersections
     test_sites = set(test_df['intersection_id'].unique())
-    train_sites = set(range(1, 32))  # Training had sites 1-31
+    train_sites = set(train_vocab.get("site_mapping", {}).keys())
     unseen_sites = test_sites - train_sites
 
     print(f"\n[Site Analysis]")
-    print(f"Training sites: 1-31 ({len(train_sites)} sites)")
+    if train_sites:
+        print(f"Training sites: {min(train_sites)}-{max(train_sites)} ({len(train_sites)} sites)")
+    else:
+        print("Training site mapping unavailable in vocab")
     print(f"Test sites: {min(test_sites)}-{max(test_sites)} ({len(test_sites)} sites)")
     print(f"Unseen sites: {len(unseen_sites)} sites")
 
     if unseen_sites:
-        print(f"[WARNING] Mapping unseen sites to site 31 (will use site_obs only)")
-
-    return vocab
-
-
-def encode_test_data(test_df, train_encoders):
-    """
-    Encode test data using training encoders.
-    Map unseen intersection_ids to 30 (last training site index, 0-indexed).
-    """
-    df = test_df.copy()
-
-    # Use training encoders
-    for col, encoder in train_encoders.items():
-        if col == 'intersection_id':
-            continue  # Handle separately
-        df[col] = encoder.transform(df[col])
-
-    # Handle intersection_id: map unseen (32-50) to 30 (last training site, 0-indexed)
-    # Training sites: 1-31 → encoded as 0-30
-    df['intersection_id'] = df['intersection_id'].apply(
-        lambda x: 30 if x > 31 else (x - 1)  # Map 32-50 → 30, map 1-31 → 0-30
-    )
-
-    return df
+        print("[INFO] Unseen sites use the reserved unknown-site id; evaluation disables site intercept.")
 
 
 def test_on_independent_set():
     """Main testing function."""
     print("="*70)
-    print("Testing TG-MVMT-GFNet v2 on Configured Test Set")
+    print("Testing M2G-Net v2 on Configured Test Set")
     print("="*70)
 
-    # Load model and training data info
-    from src.data_pipeline import load_data
-    train_df, val_df, test_df_orig, encoders, vocab = load_data()
-
-    model = TGMVMTGFNetV2(vocab)
-    loss_fn = UncertaintyWeightedLoss()
-
-    ckpt = torch.load(cfg.CHECKPOINT_PATH, weights_only=False)
-    model.load_state_dict(ckpt["model_state"])
-    loss_fn.load_state_dict(ckpt["loss_state"])
-    model.eval()
+    # Load model and train-time preprocessing from checkpoint metadata.
+    bundle = load_model_bundle()
+    encoders = bundle["encoders"]
+    vocab = bundle["vocab"]
+    model = bundle["model"]
+    thresholds = bundle["thresholds"]
 
     print(f"Loaded model from: {cfg.CHECKPOINT_PATH}")
-    print(f"Model trained on sites: 1-31")
+    train_sites = sorted(vocab.get("site_mapping", {}).keys())
+    if train_sites:
+        print(f"Model trained on sites: {train_sites[0]}-{train_sites[-1]}")
 
     # Load independent test set
     test_df = load_independent_test_set()
-    test_vocab = build_vocab_for_test(test_df, vocab)
+    report_site_coverage(test_df, vocab)
 
-    # Encode test data using training encoders
-    test_df_encoded = encode_test_data(test_df, encoders)
+    # Encode test data using checkpoint preprocessing.
+    test_df_encoded = encode_with_preprocessing(test_df, encoders, vocab["site_mapping"])
 
     # Create dataset and loader
     test_dataset = RiderDataset(test_df_encoded, vocab)
@@ -130,8 +101,11 @@ def test_on_independent_set():
     all_masks = np.vstack(all_masks)
 
     # Compute metrics
-    metrics = compute_all_metrics(all_targets, all_probs, all_masks)
-    print_results(metrics, title="Independent Test Set Results")
+    metrics_default = compute_all_metrics(all_targets, all_probs, all_masks)
+    print_results(metrics_default, title="Independent Test Set Results (threshold=0.5)")
+
+    metrics = compute_all_metrics(all_targets, all_probs, all_masks, thresholds=thresholds)
+    print_results(metrics, title="Independent Test Set Results (validation-tuned thresholds)")
 
     # Compare with original test set performance
     print("\n" + "="*70)

@@ -1,7 +1,7 @@
 # Paper Experiment Plan
 
 This checklist captures the minimum evidence needed before positioning
-TG-MVMT-GFNet as a strong Q1/A* empirical paper.
+M2G-Net as a strong Q1/A* empirical paper.
 
 ## Core Contribution Statement
 

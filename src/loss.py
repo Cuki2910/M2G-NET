@@ -37,12 +37,19 @@ class UncertaintyWeightedLoss(nn.Module):
     After training, exp(0.5 * log_tau_sq) gives tau_k (task uncertainty).
     """
 
-    def __init__(self, num_tasks=cfg.NUM_TASKS, use_focal=cfg.USE_FOCAL_LOSS):
+    def __init__(self, num_tasks=cfg.NUM_TASKS, use_focal=cfg.USE_FOCAL_LOSS,
+                 pos_weight=None, use_pos_weight=cfg.USE_POS_WEIGHT):
         super().__init__()
         # Parameterize log(tau^2) for numerical stability.
         self.log_tau_sq = nn.Parameter(torch.zeros(num_tasks))
         self.use_focal    = use_focal
         self.num_tasks    = num_tasks
+        self.use_pos_weight = use_pos_weight
+        if pos_weight is None:
+            pos_weight = torch.ones(num_tasks, dtype=torch.float32)
+        else:
+            pos_weight = torch.as_tensor(pos_weight, dtype=torch.float32)
+        self.register_buffer("pos_weight", pos_weight)
 
     def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
                               missing_keys, unexpected_keys, error_msgs):
@@ -51,6 +58,9 @@ class UncertaintyWeightedLoss(nn.Module):
         new_key = prefix + "log_tau_sq"
         if old_key in state_dict and new_key not in state_dict:
             state_dict[new_key] = state_dict.pop(old_key)
+        pos_weight_key = prefix + "pos_weight"
+        if pos_weight_key not in state_dict:
+            state_dict[pos_weight_key] = torch.ones(self.num_tasks, dtype=self.pos_weight.dtype)
         super()._load_from_state_dict(
             state_dict, prefix, local_metadata, strict,
             missing_keys, unexpected_keys, error_msgs,
@@ -79,6 +89,13 @@ class UncertaintyWeightedLoss(nn.Module):
                 per_sample_loss = focal_loss(pred_k, target_k)
             else:
                 per_sample_loss = F.binary_cross_entropy(pred_k, target_k, reduction="none")
+            if self.use_pos_weight:
+                class_weight = torch.where(
+                    target_k == 1,
+                    self.pos_weight[k].to(target_k.device),
+                    torch.ones((), device=target_k.device, dtype=target_k.dtype),
+                )
+                per_sample_loss = per_sample_loss * class_weight
 
             loss_k = masked_mean(per_sample_loss, mask_k)
             if loss_k is None:

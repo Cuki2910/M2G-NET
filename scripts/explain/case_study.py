@@ -10,37 +10,34 @@ Shows why model predicts high/low risk for specific riders.
 import sys, os
 sys.path.insert(0, ".")
 
+from datetime import date
 import numpy as np
 import pandas as pd
 import torch
 
 import config as cfg
-from src.data_pipeline import load_data, get_loaders
-from src.model import TGMVMTGFNetV2
-from src.loss import UncertaintyWeightedLoss
+from src.checkpoint import load_model_bundle
+from src.data_pipeline import get_loaders
+from src.model import count_parameters
 
 
-def load_best_model(vocab):
-    model = TGMVMTGFNetV2(vocab)
-    loss_fn = UncertaintyWeightedLoss()
-    ckpt = torch.load(cfg.CHECKPOINT_PATH, weights_only=False)
-    model.load_state_dict(ckpt["model_state"])
-    loss_fn.load_state_dict(ckpt["loss_state"])
-    model.eval()
-    return model, loss_fn
-
-
-def decode_sample(sample_idx, df, encoders):
+def decode_sample(sample_idx, raw_df):
     """Decode a sample back to human-readable format."""
-    row = df.iloc[sample_idx]
+    row = raw_df.iloc[sample_idx]
     decoded = {}
 
-    for col, encoder in encoders.items():
+    feature_cols = (
+        list(cfg.INDIVIDUAL_VIEW_COLS["rider_role"]) +
+        list(cfg.INDIVIDUAL_VIEW_COLS["rider_traits"]) +
+        list(cfg.CONTEXTUAL_VIEW_COLS["road_context"]) +
+        list(cfg.CONTEXTUAL_VIEW_COLS["environment"]) +
+        list(cfg.CONTEXTUAL_VIEW_COLS["site_obs"])
+    )
+    for col in feature_cols:
         if col in row.index:
-            decoded[col] = encoder.inverse_transform([int(row[col])])[0]
+            decoded[col] = row[col]
 
-    # Handle intersection_id (not encoded by LabelEncoder)
-    decoded['intersection_id'] = int(row['intersection_id']) + 1  # Convert back to 1-indexed
+    decoded["intersection_id"] = row[cfg.SITE_ID_COL]
 
     return decoded
 
@@ -67,11 +64,26 @@ def format_gate_weights(gate_weights):
     return ", ".join(formatted) if formatted else "Balanced"
 
 
-def generate_case_study(sample_idx, df, encoders, vocab, model, test_loader):
+def ascii_preview(text):
+    replacements = {
+        "🔴": "RED",
+        "🟠": "ORANGE",
+        "🟡": "YELLOW",
+        "🟢": "GREEN",
+        "✓": "correct",
+        "✗": "wrong",
+        "→": "->",
+    }
+    for src, dst in replacements.items():
+        text = text.replace(src, dst)
+    return text
+
+
+def generate_case_study(sample_idx, encoded_df, raw_df, vocab, model, test_loader, thresholds=None):
     """Generate detailed case study for a single sample."""
 
     # Get decoded sample info
-    decoded = decode_sample(sample_idx, df, encoders)
+    decoded = decode_sample(sample_idx, raw_df)
 
     # Get model predictions
     views_batch, targets_batch = None, None
@@ -129,8 +141,9 @@ def generate_case_study(sample_idx, df, encoders, vocab, model, test_loader):
     for task in cfg.TASK_NAMES:
         prob = predictions[task]
         truth = ground_truth[task]
+        threshold = thresholds.get(task, 0.5) if thresholds else 0.5
         risk_level, emoji = get_risk_level(prob)
-        correct = "✓" if (prob >= 0.5) == truth else "✗"
+        correct = "✓" if (prob >= threshold) == truth else "✗"
 
         narrative.append(f"\n{task.replace('_', ' ').title()}:")
         narrative.append(f"  Predicted Risk: {prob:.1%} ({risk_level} {emoji})")
@@ -170,7 +183,10 @@ def generate_case_study(sample_idx, df, encoders, vocab, model, test_loader):
 
     # Summary
     narrative.append("\n[SUMMARY]")
-    high_risk_tasks = [task for task, prob in predictions.items() if prob >= 0.5]
+    high_risk_tasks = [
+        task for task, prob in predictions.items()
+        if prob >= (thresholds.get(task, 0.5) if thresholds else 0.5)
+    ]
 
     if high_risk_tasks:
         narrative.append(f"High-risk violations: {', '.join([t.replace('_', ' ') for t in high_risk_tasks])}")
@@ -184,7 +200,7 @@ def generate_case_study(sample_idx, df, encoders, vocab, model, test_loader):
     return "\n".join(narrative)
 
 
-def select_interesting_samples(df, test_loader, model, n_samples=10):
+def select_interesting_samples(df, test_loader, model, n_samples=10, thresholds=None):
     """
     Select interesting samples for case studies:
     - High risk predictions (prob > 0.7)
@@ -221,7 +237,11 @@ def select_interesting_samples(df, test_loader, model, n_samples=10):
         selected.extend(np.random.choice(low_risk_indices, min(2, len(low_risk_indices)), replace=False))
 
     # 3. Misclassifications (predicted != actual)
-    pred_labels = (all_probs >= 0.5).astype(int)
+    threshold_values = np.array([
+        thresholds.get(task, 0.5) if thresholds else 0.5
+        for task in cfg.TASK_NAMES
+    ])
+    pred_labels = (all_probs >= threshold_values).astype(int)
     misclass_mask = (pred_labels != all_targets).any(axis=1)
     misclass_indices = np.where(misclass_mask)[0]
     if len(misclass_indices) > 0:
@@ -244,24 +264,30 @@ def main():
     print("CASE STUDIES GENERATOR")
     print("="*80)
 
-    # Load data and model
-    train_df, val_df, test_df, encoders, vocab = load_data()
+    # Load data and model from checkpoint metadata.
+    bundle = load_model_bundle()
+    train_df, val_df, test_df = bundle["train_df"], bundle["val_df"], bundle["test_df"]
+    raw_test_df = bundle["raw_test_df"]
+    vocab = bundle["vocab"]
+    thresholds = bundle["thresholds"]
     _, _, test_loader = get_loaders(train_df, val_df, test_df, vocab)
-    model, loss_fn = load_best_model(vocab)
+    model = bundle["model"]
 
     print(f"\nLoaded model from: {cfg.CHECKPOINT_PATH}")
     print(f"Test set size: {len(test_df)}")
 
     # Select interesting samples
     print("\nSelecting interesting samples...")
-    selected_indices = select_interesting_samples(test_df, test_loader, model, n_samples=10)
+    selected_indices = select_interesting_samples(
+        test_df, test_loader, model, n_samples=10, thresholds=thresholds)
     print(f"Selected {len(selected_indices)} samples for case studies")
 
     # Generate case studies
     case_studies = []
     for idx in selected_indices:
         print(f"Generating case study for sample #{idx + 1}...")
-        study = generate_case_study(idx, test_df, encoders, vocab, model, test_loader)
+        study = generate_case_study(
+            idx, test_df, raw_test_df, vocab, model, test_loader, thresholds=thresholds)
         if study:
             case_studies.append(study)
 
@@ -270,9 +296,9 @@ def main():
     os.makedirs("outputs", exist_ok=True)
 
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write("# Case Studies: TG-MVMT-GFNet v2 Predictions\n\n")
-        f.write("**Generated:** 2026-05-10\n")
-        f.write(f"**Model:** TG-MVMT-GFNet v2 (14,513 parameters)\n")
+        f.write("# Case Studies: M2G-Net v2 Predictions\n\n")
+        f.write(f"**Generated:** {date.today().isoformat()}\n")
+        f.write(f"**Model:** M2G-Net v2 ({count_parameters(model):,} parameters)\n")
         f.write(f"**Test Set:** {len(test_df)} samples\n\n")
         f.write("---\n\n")
 
@@ -288,7 +314,7 @@ def main():
         print("\n" + "="*80)
         print("PREVIEW: First Case Study")
         print("="*80)
-        print(case_studies[0])
+        print(ascii_preview(case_studies[0]))
 
 
 if __name__ == "__main__":

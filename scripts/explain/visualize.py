@@ -20,24 +20,13 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix
 
 import config as cfg
-from src.data_pipeline import load_data, get_loaders
-from src.model import TGMVMTGFNetV2
-from src.loss  import UncertaintyWeightedLoss
+from src.checkpoint import load_model_bundle
+from src.data_pipeline import get_loaders
 
 os.makedirs("outputs", exist_ok=True)
 
 VIEW_LABELS = ["Rider\nRole", "Rider\nTraits", "Road\nCtx", "Environ\n-ment", "Site", "Inter-\naction"]
 TASK_LABELS = [t.replace("_", "\n") for t in cfg.TASK_NAMES]
-
-
-def load_best_model(vocab):
-    model   = TGMVMTGFNetV2(vocab)
-    loss_fn = UncertaintyWeightedLoss()
-    ckpt    = torch.load(cfg.CHECKPOINT_PATH, weights_only=False)
-    model.load_state_dict(ckpt["model_state"])
-    loss_fn.load_state_dict(ckpt["loss_state"])
-    model.eval()
-    return model, loss_fn
 
 
 def collect_predictions(model, loader):
@@ -125,13 +114,14 @@ def plot_per_sample_attention(all_gates, n_samples=200):
 
 # ── 3. Confusion matrix per task ──────────────────────────────────────────────
 
-def plot_confusion_matrices(all_probs, all_targets, threshold=0.5):
+def plot_confusion_matrices(all_probs, all_targets, thresholds=None):
     """2×2 confusion matrix for each of the 4 tasks."""
     fig, axes = plt.subplots(2, 2, figsize=(10, 9))
     axes = axes.flatten()
 
     for k, task in enumerate(cfg.TASK_NAMES):
         y_true = all_targets[:, k].astype(int)
+        threshold = thresholds.get(task, 0.5) if thresholds else 0.5
         y_pred = (all_probs[:, k] >= threshold).astype(int)
         cm = confusion_matrix(y_true, y_pred)
 
@@ -146,7 +136,8 @@ def plot_confusion_matrices(all_probs, all_targets, threshold=0.5):
             f"{task.replace('_',' ').title()}\nAcc={acc:.2%}  TP={tp}  FP={fp}  FN={fn}",
             fontsize=9)
 
-    plt.suptitle("Confusion Matrices per Task (threshold=0.5)", fontsize=12)
+    title_suffix = "validation-tuned thresholds" if thresholds else "threshold=0.5"
+    plt.suptitle(f"Confusion Matrices per Task ({title_suffix})", fontsize=12)
     plt.tight_layout()
     out = "outputs/confusion_matrices.png"
     plt.savefig(out, dpi=150, bbox_inches="tight")
@@ -157,14 +148,17 @@ def plot_confusion_matrices(all_probs, all_targets, threshold=0.5):
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    train_df, val_df, test_df, encoders, vocab = load_data()
+    bundle = load_model_bundle()
+    train_df, val_df, test_df = bundle["train_df"], bundle["val_df"], bundle["test_df"]
+    vocab = bundle["vocab"]
+    thresholds = bundle["thresholds"]
     _, _, test_loader = get_loaders(train_df, val_df, test_df, vocab)
-    model, loss_fn = load_best_model(vocab)
+    model = bundle["model"]
 
     all_probs, all_targets, all_gates = collect_predictions(model, test_loader)
 
     plot_gate_heatmap(all_gates)
     plot_per_sample_attention(all_gates)
-    plot_confusion_matrices(all_probs, all_targets)
+    plot_confusion_matrices(all_probs, all_targets, thresholds=thresholds)
 
     print("All visualizations saved to outputs/")

@@ -1,7 +1,7 @@
 """
 Phase 4: Regularized Task-Specific Gated Fusion + Residual Early Fusion
-- RegularizedTaskGate: softmax with temperature annealing + uniform prior (avoids mode collapse)
-- ResidualGatedFusion: z_t = alpha * z_gated + (1-alpha) * z_early  (learnable alpha)
+- RegularizedTaskGate: sparsemax with temperature scaling (sparse attention, no prior smoothing)
+- ResidualGatedFusion: z_k = sigmoid(a) * z_gated^(k) + (1-sigmoid(a)) * z_early  (learnable a)
 """
 
 import torch
@@ -13,11 +13,30 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 import config as cfg
 
 
+def sparsemax(z, dim=-1):
+    """
+    Sparsemax implementation.
+    Projects onto the probability simplex, yielding sparse probability distributions.
+    """
+    original_size = z.size()
+    z_2d = z.view(-1, original_size[dim])
+    
+    z_sorted, _ = torch.sort(z_2d, dim=1, descending=True)
+    cssv = torch.cumsum(z_sorted, dim=1) - 1
+    k = torch.arange(1, z_sorted.size(1) + 1, device=z.device, dtype=z.dtype)
+    cond = z_sorted - cssv / k > 0
+    k_val = torch.sum(cond, dim=1, keepdim=True)
+    
+    tau = torch.gather(cssv, 1, k_val.long() - 1) / k_val
+    p = torch.clamp(z_2d - tau, min=0.0)
+    
+    return p.view(original_size)
+
 class RegularizedTaskGate(nn.Module):
     """
     One gate per task.
-    Adds a uniform prior to logits and divides by a learnable temperature
-    to prevent mode collapse.
+    Divides logits by a learnable temperature to control attention sharpness.
+    Uses sparsemax instead of softmax + prior smoothing to natively filter noise.
     """
 
     def __init__(self, num_inputs, input_dim,
@@ -25,8 +44,6 @@ class RegularizedTaskGate(nn.Module):
         super().__init__()
         self.gate        = nn.Linear(num_inputs * input_dim, num_inputs)
         self.temperature = nn.Parameter(torch.tensor(float(temperature_init)))
-        # Fixed uniform prior (not learnable) — encourages balanced initial attention
-        self.register_buffer("prior", torch.ones(num_inputs) / num_inputs)
 
     def forward(self, view_reps):
         """
@@ -34,9 +51,10 @@ class RegularizedTaskGate(nn.Module):
         returns alpha: (batch, num_inputs)
         """
         h = torch.cat(view_reps, dim=-1)                            # (batch, num_inputs*dim)
-        logits = self.gate(h) + cfg.GATE_PRIOR_WEIGHT * self.prior  # add uniform prior
+        logits = self.gate(h)
         temp   = self.temperature.clamp(min=0.1)                    # avoid division by zero
-        return F.softmax(logits / temp, dim=-1)                     # (batch, num_inputs)
+        alpha  = sparsemax(logits / temp, dim=-1)                   # (batch, num_inputs)
+        return alpha
 
 
 class ResidualGatedFusion(nn.Module):

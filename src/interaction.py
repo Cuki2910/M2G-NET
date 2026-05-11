@@ -14,7 +14,8 @@ import config as cfg
 
 class CrossLevelInteraction(nn.Module):
     """
-    Computes h_inter ∈ R^d_inter capturing individual × contextual interactions.
+    Computes h_inter ∈ R^d_inter capturing individual × contextual interactions
+    using SwiGLU-style bilinear gating.
     """
 
     def __init__(self, ind_dim, ctx_dim, output_dim=cfg.INTERACTION_DIM,
@@ -23,10 +24,8 @@ class CrossLevelInteraction(nn.Module):
         proj_dim = output_dim
         self.proj_ind = nn.Linear(ind_dim, proj_dim)
         self.proj_ctx = nn.Linear(ctx_dim, proj_dim)
-        self.W_inter  = nn.Linear(proj_dim, proj_dim)
         self.out      = nn.Sequential(
             nn.Linear(proj_dim, output_dim),
-            nn.ReLU(),
             nn.Dropout(dropout),
         )
 
@@ -38,6 +37,9 @@ class CrossLevelInteraction(nn.Module):
         """
         p_ind = self.proj_ind(h_ind)        # (batch, proj_dim)
         p_ctx = self.proj_ctx(h_ctx)        # (batch, proj_dim)
-        element_wise = p_ind * p_ctx         # interaction term
-        combined = p_ind + p_ctx + self.W_inter(element_wise)
+        
+        # SwiGLU interaction
+        swish_ind = p_ind * torch.sigmoid(p_ind)
+        combined = swish_ind * p_ctx         # element-wise gating
+        
         return self.out(combined)

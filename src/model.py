@@ -1,10 +1,11 @@
 """
-Phase 6: Full TG-MVMT-GFNet v2 Model Assembly
+Phase 6: Full M2G-Net v2 Model Assembly
 Wires: ViewEncoders → CrossLevelInteraction → ResidualGatedFusion → OutputHeads
 """
 
 import torch
 import torch.nn as nn
+import warnings
 
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -89,6 +90,26 @@ class TGMVMTGFNetV2(nn.Module):
         predictions = [self.heads[k](fused[k]) for k in range(cfg.NUM_TASKS)]
 
         return predictions, gate_weights, alpha_blend
+
+    def load_state_dict(self, state_dict, strict=True):
+        """Pad older checkpoints that did not reserve an unknown-site embedding row."""
+        key = "encoders.site.site_intercept.weight"
+        if key in state_dict:
+            current = self.state_dict()[key]
+            saved = state_dict[key]
+            if saved.shape != current.shape and saved.ndim == current.ndim and saved.shape[1:] == current.shape[1:]:
+                warnings.warn(
+                    "Padding site_intercept weights from an older checkpoint. "
+                    "Verify checkpoint preprocessing metadata before trusting site-specific metrics.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
+                adapted = current.clone()
+                rows = min(saved.shape[0], current.shape[0])
+                adapted[:rows] = saved[:rows]
+                state_dict = dict(state_dict)
+                state_dict[key] = adapted
+        return super().load_state_dict(state_dict, strict=strict)
 
 
 def count_parameters(model):

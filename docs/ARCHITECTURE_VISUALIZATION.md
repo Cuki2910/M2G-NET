@@ -1,4 +1,4 @@
-# TG-MVMT-GFNet v2 Architecture
+# M2G-Net v2 Architecture
 
 This document describes the implemented architecture and uses the same
 hyperparameters as `config.py`. It is a technical reference, not a submission
@@ -9,7 +9,7 @@ claim about real-world external validity.
 The updated paper-facing SVG figure is saved at:
 
 ```text
-outputs/tg_mvmt_gfnet_architecture_v2.svg
+outputs/m2g_net_architecture_v2.svg
 ```
 
 It includes the cross-level interaction block, six gated inputs, task-specific
@@ -53,7 +53,8 @@ Cross-level interaction
         |
         v
 Task-specific gated fusion
-  alpha_k = softmax((A_k r + c_k + pi) / T)
+  alpha_raw_k = softmax((A_k r + c_k) / T)
+  alpha_k = (alpha_raw_k + lambda * uniform_prior) / (1 + lambda)
   z_gated_k = sum_j alpha_kj * h_tilde_j
         |
         v
@@ -118,13 +119,13 @@ These values are read from `config.py`:
 | `NUM_GATE_INPUTS` | 6 |
 | `TEMPERATURE_INIT` | 2.0 |
 | `TEMPERATURE_FINAL` | 1.0 |
-| `GATE_PRIOR_WEIGHT` | 1.0 |
+| `GATE_PRIOR_WEIGHT` | 0.1 |
 | `LEARNING_RATE` | 1e-3 |
 | `WEIGHT_DECAY` | 1e-4 |
 | `BATCH_SIZE` | 64 |
 | `MAX_EPOCHS` | 150 |
 | `EARLY_STOPPING_PATIENCE` | 20 |
-| `USE_FOCAL_LOSS` | False |
+| `USE_FOCAL_LOSS` | True |
 
 ## Interpretation Language
 

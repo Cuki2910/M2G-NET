@@ -19,23 +19,12 @@ import numpy as np
 import torch
 
 import config as cfg
-from src.data_pipeline import load_data, get_loaders
-from src.model import TGMVMTGFNetV2
-from src.loss  import UncertaintyWeightedLoss
+from src.checkpoint import load_model_bundle
+from src.data_pipeline import get_loaders
 from src.metrics import compute_all_metrics, print_results
 
 
-def load_best_model(vocab):
-    model   = TGMVMTGFNetV2(vocab)
-    loss_fn = UncertaintyWeightedLoss()
-    ckpt    = torch.load(cfg.CHECKPOINT_PATH, weights_only=False)
-    model.load_state_dict(ckpt["model_state"])
-    loss_fn.load_state_dict(ckpt["loss_state"])
-    model.eval()
-    return model, loss_fn
-
-
-def evaluate(model, loss_fn, loader, use_site_intercept=True):
+def evaluate(model, loss_fn, loader, use_site_intercept=True, thresholds=None):
     all_probs, all_targets, all_masks = [], [], []
     with torch.no_grad():
         for views, targets, masks in loader:
@@ -47,7 +36,7 @@ def evaluate(model, loss_fn, loader, use_site_intercept=True):
     all_probs   = np.vstack(all_probs)
     all_targets = np.vstack(all_targets)
     all_masks   = np.vstack(all_masks)
-    return compute_all_metrics(all_targets, all_probs, all_masks)
+    return compute_all_metrics(all_targets, all_probs, all_masks, thresholds=thresholds)
 
 
 def ablate_view(model, view_to_zero, views_batch):
@@ -74,9 +63,9 @@ def ablate_view(model, view_to_zero, views_batch):
     return hooks
 
 
-def run_view_ablation(model, loss_fn, test_loader, vocab):
+def run_view_ablation(model, loss_fn, test_loader, vocab, thresholds=None):
     print("\n=== View Ablation ===")
-    base = evaluate(model, loss_fn, test_loader)
+    base = evaluate(model, loss_fn, test_loader, thresholds=thresholds)
     base_auc = base["macro"]["roc_auc"]
     print(f"Full model macro ROC-AUC: {base_auc:.4f}")
 
@@ -94,25 +83,28 @@ def run_view_ablation(model, loss_fn, test_loader, vocab):
 
         enc.forward = make_zero_forward(orig_forward)
 
-        res = evaluate(m_copy, loss_fn, test_loader)
+        res = evaluate(m_copy, loss_fn, test_loader, thresholds=thresholds)
         drop = base_auc - res["macro"]["roc_auc"]
         print(f"  - {view:<20}: AUC={res['macro']['roc_auc']:.4f}  (drop={drop:+.4f})")
 
 
-def run_site_ablation(model, loss_fn, test_loader):
+def run_site_ablation(model, loss_fn, test_loader, thresholds=None):
     print("\n=== Site Ablation ===")
     # With intercept (in-distribution)
-    res_full = evaluate(model, loss_fn, test_loader, use_site_intercept=True)
+    res_full = evaluate(model, loss_fn, test_loader, use_site_intercept=True, thresholds=thresholds)
     # Without intercept (out-of-distribution / leave-intersection-out)
-    res_obs  = evaluate(model, loss_fn, test_loader, use_site_intercept=False)
+    res_obs  = evaluate(model, loss_fn, test_loader, use_site_intercept=False, thresholds=thresholds)
     print(f"  Site full (obs + intercept): {res_full['macro']['roc_auc']:.4f}")
     print(f"  Site obs only (no intercept): {res_obs['macro']['roc_auc']:.4f}")
 
 
 if __name__ == "__main__":
-    train_df, val_df, test_df, encoders, vocab = load_data()
+    bundle = load_model_bundle()
+    train_df, val_df, test_df = bundle["train_df"], bundle["val_df"], bundle["test_df"]
+    vocab = bundle["vocab"]
+    thresholds = bundle["thresholds"]
     _, _, test_loader = get_loaders(train_df, val_df, test_df, vocab)
-    model, loss_fn = load_best_model(vocab)
+    model, loss_fn = bundle["model"], bundle["loss_fn"]
 
-    run_view_ablation(model, loss_fn, test_loader, vocab)
-    run_site_ablation(model, loss_fn, test_loader)
+    run_view_ablation(model, loss_fn, test_loader, vocab, thresholds=thresholds)
+    run_site_ablation(model, loss_fn, test_loader, thresholds=thresholds)

@@ -1,0 +1,53 @@
+{
+  "skill_name": "critical-transport-editor",
+  "evals": [
+    {
+      "id": 1,
+      "name": "synthetic-data-overclaim",
+      "prompt": "Review this abstract for a paper I'm submitting to Transportation Research Part C:\n\n\"We propose TG-MVMT-GFNet, a novel multi-view multi-task gated fusion network for predicting motorcycle risky behaviors at intersections. Our model achieves 0.73 macro ROC-AUC across four behaviors (red-light running, no turn signal, helmet non-use, mobile phone use), outperforming decision trees (0.71) and XGBoost (0.67). The model uses theory-guided view decomposition with individual-level (rider role, rider traits) and contextual-level (road context, environment, site context) representations, learning cross-level interactions through a dedicated module. Task-specific gated fusion with uncertainty weighting allows the model to adaptively weight different information sources for each behavior. We validate on 9,164 observations from 31 intersections and demonstrate strong generalization to unseen intersections. Our interpretability analysis using gate weights and Integrated Gradients reveals that rider role contributes most to helmet non-use (35%), while road context dominates red-light running predictions (28%). This work provides actionable insights for targeted traffic safety interventions.\"\n\nBe brutally honest - is this publishable at a top-tier journal?",
+      "expected_output": "Should identify: (1) synthetic data not disclosed, (2) marginal improvement over baselines, (3) generalization claim not supported by synthetic validation, (4) interpretability claims need validation, (5) missing key details (sample size per behavior, class imbalance, statistical significance)",
+      "expectations": [
+        "Identifies that synthetic data is not disclosed in abstract",
+        "Questions the 'strong generalization' claim without real validation data",
+        "Points out marginal improvement over baselines (0.73 vs 0.71 decision tree)",
+        "Flags missing statistical significance tests",
+        "Notes class imbalance not mentioned",
+        "Suggests more cautious framing for synthetic validation",
+        "Provides rewritten version with appropriate hedging"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "causal-language-observational-data",
+      "prompt": "I'm writing a policy brief on bike lane impacts. Here's a key paragraph - please review:\n\n\"Our analysis of 50 cities over 5 years demonstrates that bike lane installation causes a 23% reduction in car usage and a 15% decrease in local air pollution. Cities that invested $10M or more in bike infrastructure saw even larger effects, with car usage dropping by 31%. These findings prove that bike lanes are an effective tool for reducing urban emissions and should be prioritized in climate action plans. We recommend that all cities allocate at least 5% of transportation budgets to bike infrastructure to achieve meaningful emission reductions.\"\n\nDoes this sound convincing for city planners?",
+      "expected_output": "Should identify: (1) causal language ('causes', 'prove') without causal design, (2) reverse causality not addressed, (3) confounding (cities that build bike lanes differ systematically), (4) policy recommendation too strong given evidence, (5) missing cost-benefit analysis",
+      "expectations": [
+        "Flags 'causes' and 'prove' as inappropriate for observational data",
+        "Points out reverse causality (bike-friendly cities build more lanes)",
+        "Identifies confounding variables (income, density, political climate)",
+        "Notes that correlation between investment and effect doesn't imply causation",
+        "Suggests more cautious language ('associated with', 'suggests')",
+        "Questions policy recommendation strength given evidence limitations",
+        "Provides rewritten version with appropriate causal language",
+        "Suggests what evidence would be needed for causal claims"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "ml-methodology-review",
+      "prompt": "Quick methodology check before I submit - does this sound solid?\n\n\"We collected data from 10,000 trips across 15 cities. After removing incomplete records, we had 8,500 trips. We split the data 80/20 for training and testing. We tried several models (logistic regression, random forest, neural network) and tuned their hyperparameters to maximize test set accuracy. Our final neural network achieved 94% accuracy, significantly better than the 87% accuracy of logistic regression. We used SHAP values to interpret the model and found that trip distance was the most important feature. The model is ready for deployment in our ride-sharing app to predict trip cancellations.\"\n\nAnything I should add or change?",
+      "expected_output": "Should identify: (1) hyperparameter tuning on test set (major flaw), (2) no validation set, (3) accuracy on imbalanced data (likely), (4) missing details on removed records, (5) no discussion of deployment challenges, (6) single metric focus",
+      "expectations": [
+        "Identifies hyperparameter tuning on test set as fatal flaw",
+        "Points out missing validation set in train/val/test split",
+        "Questions whether 94% accuracy is meaningful without knowing class distribution",
+        "Asks about the 1,500 removed records (15% of data - bias?)",
+        "Notes missing baseline comparison details",
+        "Flags 'ready for deployment' as overclaim without discussing real-world challenges",
+        "Suggests proper methodology: train/val/test split, tune on validation only",
+        "Recommends reporting imbalance-robust metrics (ROC-AUC, PR-AUC, F1)",
+        "Provides corrected methodology description"
+      ]
+    }
+  ]
+}

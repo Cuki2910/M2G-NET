@@ -1,8 +1,8 @@
-# 🏗️ Implementation Plan: TG-MVMT-GFNet v2
+# 🏗️ Implementation Plan: M2G-Net v2
 
 **Model:** Theory-Guided Multi-View Multi-Task Gated Fusion Network (v2)
-**Source:** [methodology_v2.md](file:///a:/GREEN-X/TG-MVMT-GFNet/tg_mvmt_gfnet_methodology_v2.md) | [comparison](file:///a:/GREEN-X/TG-MVMT-GFNet/comparison_v1_vs_v2.md)
-**Guidelines:** [CLAUDE.md](file:///a:/GREEN-X/TG-MVMT-GFNet/CLAUDE.md)
+**Source:** [methodology_v2.md](file:///a:/GREEN-X/M2G-Net/m2g_net_methodology_v2.md) | [comparison](file:///a:/GREEN-X/M2G-Net/comparison_v1_vs_v2.md)
+**Guidelines:** [CLAUDE.md](file:///a:/GREEN-X/M2G-Net/CLAUDE.md)
 
 ---
 
@@ -33,7 +33,7 @@ Individual Views           Contextual Views
 ## Cấu trúc thư mục
 
 ```text
-TG-MVMT-GFNet/
+M2G-Net/
 ├── config.py                    # Hyperparameters
 ├── requirements.txt
 ├── data/
@@ -45,7 +45,7 @@ TG-MVMT-GFNet/
 │   ├── views.py                 # View-specific encoders
 │   ├── interaction.py           # [MỚI] Cross-level interaction module
 │   ├── fusion.py                # Regularized task-specific gated fusion + residual
-│   ├── model.py                 # Full TG-MVMT-GFNet v2
+│   ├── model.py                 # Full M2G-Net v2
 │   ├── loss.py                  # Uncertainty-weighted multi-task loss
 │   └── metrics.py               # ROC-AUC, PR-AUC, F1, Balanced Acc, MTL Ratio
 ├── baselines/
@@ -276,8 +276,9 @@ class CrossLevelInteraction(nn.Module):
 H_full = {h_role, h_trait, h_road, h_env, h_site, h_inter}  (6 inputs)
 
 Với mỗi task t:
-  logits_t = W_gate_t · concat(H_full) + uniform_prior
-  α_t = softmax(logits_t / temperature)
+  logits_t = W_gate_t · concat(H_full)
+  α_raw_t = softmax(logits_t / temperature)
+  α_t = (α_raw_t + λ · uniform_prior) / (1 + λ)
   z_t_gated = Σ_v α_t_v · h_v
 
   z_t_early = MLP_early(concat(h_role, h_trait, h_road, h_env, h_site))
@@ -295,8 +296,9 @@ class RegularizedTaskGate(nn.Module):
 
     def forward(self, view_reps):
         h_concat = torch.cat(view_reps, dim=-1)
-        logits = self.gate(h_concat) + self.prior
+        logits = self.gate(h_concat)
         alpha = F.softmax(logits / self.temperature.clamp(min=0.1), dim=-1)
+        alpha = (alpha + cfg.GATE_PRIOR_WEIGHT * self.prior) / (1.0 + cfg.GATE_PRIOR_WEIGHT)
         return alpha
 
 
@@ -439,14 +441,32 @@ TGMVMTGFNetV2:
 Model                   | Red-light  | No Signal  | Helmet    | Phone     | Macro Avg | MTL Ratio
                         | AUC / F1   | AUC / F1   | AUC / F1  | AUC / F1  | AUC / F1  |
 ------------------------|------------|------------|-----------|-----------|-----------|----------
-Decision Tree           |            |            |           |           |           | N/A
-Logistic Regression     |            |            |           |           |           | N/A
-Random Forest           |            |            |           |           |           | N/A
-XGBoost / LightGBM      |            |            |           |           |           | N/A
-Early-Fusion MLP        |            |            |           |           |           | N/A
-Late Fusion             |            |            |           |           |           | N/A
-Single-Task MLP         |            |            |           |           |           | 1.00 (ref)
-**TG-MVMT-GFNet v2**    |            |            |           |           |           | xx
+Decision Tree           | .6758/.0000| .6215/.0556| .7729/.0000| .7576/.0327| .7069/.0221| N/A
+Logistic Regression     | .6373/.0000| .6222/.0000| .6431/.0000| .6818/.0000| .6461/.0000| N/A
+Random Forest           | .6306/.0711| .5707/.2831| .7436/.0814| .6980/.2121| .6607/.1619| N/A
+XGBoost                 | .6402/.0944| .5697/.2618| .7532/.1256| .6996/.2335| .6657/.1788| N/A
+LightGBM                | .6758/.0000| .6138/.0754| .7688/.0000| .7401/.0327| .6996/.0270| N/A
+Early-Fusion MLP        | .6636/.0000| .6219/.0103| .7856/.0000| .7490/.0000| .7050/.0026| N/A
+Late Fusion             | not run    | not run    | not run   | not run   | not run   | N/A
+Single-Task MLP         | .6545/.0104| .6131/.1310| .7959/.0000| .7406/.0110| .7010/.0381| 1.00 (ref)
+**M2G-Net v2**    | .6748/.0000| .6165/.0000| .7808/.0000| .7526/.0111| .7062/.0028| 1.01 macro
+```
+
+Current numbers are from a single synthetic random-split run using
+`python baselines/run_all_baselines.py` plus evaluation of
+`checkpoints/best_model.pt` for M2G-Net v2. They are proof-of-concept
+results only; paper-ready reporting still needs repeated seeds, tuned
+baselines, confidence intervals, and significance tests.
+
+Per-task MTL transfer ratios for M2G-Net v2 versus Single-Task MLP:
+
+```text
+Task                  MTL / Single-task AUC
+Red-light             1.0310
+No signal             1.0055
+Helmet                0.9810
+Phone                 1.0162
+Macro                 1.0074
 ```
 
 ### MTL Transfer Ratio (MỚI v2)
@@ -522,90 +542,100 @@ MTL_Transfer_Ratio_k = MTL_AUC_k / Single_Task_AUC_k
 | 10.6 | Risk profile visualization | Heatmap |
 | 10.7 | SHAP cho XGBoost baseline | Cross-check |
 
-### Triple-Validation Table (MỚI v2)
+### Triple-Validation Table (MỚI v2, current run)
 
 ```text
 View              | Gate Weight | Integrated Gradients | Ablation Drop | Consistent?
-------------------|-------------|---------------------|---------------|------------
-Rider Role        | xx%         | xx%                 | -xx AUC       | ✓ / ✗
-Road Context      | xx%         | xx%                 | -xx AUC       | ✓ / ✗
-Environment       | xx%         | xx%                 | -xx AUC       | ✓ / ✗
-Site              | xx%         | xx%                 | -xx AUC       | ✓ / ✗
-Rider Traits      | xx%         | xx%                 | -xx AUC       | ✓ / ✗
-Cross-Level Inter | xx%         | xx%                 | -xx AUC       | ✓ / ✗
+------------------|-------------|----------------------|---------------|------------
+Rider Role        | 26.69%      | 26.33%               | +0.1419 AUC   | Yes
+Road Context      | 22.71%      | 24.84%               | +0.0390 AUC   | Yes
+Environment       | 17.88%      | 24.32%               | +0.0277 AUC   | Partial
+Site              | 6.88%       | 10.85%               | -0.0031 AUC   | No
+Rider Traits      | 6.68%       | 8.01%                | +0.0011 AUC   | No
+Cross-Level Inter | 19.16%      | 5.64%                | +0.0442 AUC   | Yes
 ```
+
+Current triple-validation values are macro averages across the four risky
+behavior tasks on the synthetic random-split test set. Full-model macro
+ROC-AUC is `0.7062`; `Ablation Drop = full model AUC - ablated AUC`, so a
+positive value means the model gets worse when that component is removed.
+Integrated Gradients is approximated with normalized gradient x activation at
+the view representation level. `Consistent?` is marked `Yes` when at least two
+of the three signals rank the component in the top three.
 
 ---
 
 ## Checklist tổng thể
 
 ```text
+Legend: [x] done, [~] partial / proof-of-concept, [ ] not done
+
 Phase 0: Setup
-[ ] Cấu trúc thư mục
-[ ] requirements.txt (+ captum)
-[ ] config.py (+ hierarchical, interaction, uncertainty params)
+[x] Cấu trúc thư mục
+[x] requirements.txt (+ captum)
+[x] config.py (+ hierarchical, interaction, uncertainty params)
 
 Phase 1: Data Pipeline
-[ ] Load & clean data
-[ ] View-column mapping (individual vs contextual levels)
-[ ] Site view tách observed + site_id
-[ ] Train/Val/Test split (stratified)
-[ ] Leave-Intersection-Out split
-[ ] PyTorch Dataset & DataLoader
+[x] Load & clean data
+[x] View-column mapping (individual vs contextual levels)
+[x] Site view tách observed + site_id
+[x] Train/Val/Test split (stratified)
+[x] Leave-Intersection-Out split
+[x] PyTorch Dataset & DataLoader
 
 Phase 2: View Encoders
-[ ] ViewEncoder base + per-view encoders
-[ ] SiteAwareEncoder (observed + random intercept)
-[ ] Unit test all encoders
+[x] ViewEncoder base + per-view encoders
+[x] SiteAwareEncoder (observed + random intercept)
+[~] Unit test all encoders
 
 Phase 3: Cross-Level Interaction (MỚI)
-[ ] CrossLevelInteraction module
-[ ] Test h_ind × h_ctx → h_inter
+[x] CrossLevelInteraction module
+[~] Test h_ind × h_ctx → h_inter
 
 Phase 4: Regularized Gated Fusion + Residual (MỚI)
-[ ] RegularizedTaskGate (temperature + prior)
-[ ] ResidualGatedFusion (gated + early blend)
-[ ] Learnable alpha parameter
+[x] RegularizedTaskGate (temperature + prior)
+[x] ResidualGatedFusion (gated + early blend)
+[x] Learnable alpha parameter
 
 Phase 5: Uncertainty-Weighted Loss (MỚI)
-[ ] UncertaintyWeightedLoss (learnable σ_k)
-[ ] Optional focal loss
+[x] UncertaintyWeightedLoss (learnable σ_k)
+[x] Optional focal loss
 
 Phase 6: Full Model
-[ ] TGMVMTGFNetV2 assembly
-[ ] Parameter count < 50K
+[x] TGMVMTGFNetV2 assembly
+[x] Parameter count < 50K
 
 Phase 7: Training
-[ ] Training loop + validation
-[ ] Early stopping
-[ ] Temperature annealing
-[ ] Log σ_k + alpha mỗi epoch
+[x] Training loop + validation
+[x] Early stopping
+[x] Temperature annealing
+[x] Log σ_k + alpha mỗi epoch
 [ ] K-Fold CV
-[ ] Leave-Intersection-Out CV (intercept OFF)
+[x] Leave-Intersection-Out CV (intercept OFF)
 
 Phase 8: Baselines
-[ ] Decision Tree
-[ ] Logistic Regression
-[ ] Random Forest
-[ ] XGBoost / LightGBM
-[ ] Early-Fusion MLP
+[x] Decision Tree
+[x] Logistic Regression
+[x] Random Forest
+[x] XGBoost / LightGBM
+[x] Early-Fusion MLP
 [ ] Late Fusion
-[ ] Single-Task MLP (MỚI) → MTL Transfer Ratio
+[x] Single-Task MLP (MỚI) → MTL Transfer Ratio
 
 Phase 9: Ablation
-[ ] View ablation (5 experiments)
+[x] View ablation (5 experiments)
 [ ] Fusion ablation (5 experiments)
-[ ] Multi-task ablation (4 experiments)
-[ ] Cross-level interaction ablation (MỚI)
-[ ] Site encoding ablation (MỚI)
+[~] Multi-task ablation (4 experiments)
+[~] Cross-level interaction ablation (MỚI)
+[x] Site encoding ablation (MỚI)
 
 Phase 10: Interpretability
-[ ] Gate weights visualization
-[ ] Integrated Gradients (MỚI)
-[ ] Triple-validation: Gate vs IG vs Ablation (MỚI)
-[ ] σ_k analysis (MỚI)
-[ ] Alpha blend analysis (MỚI)
-[ ] Risk profile heatmap
+[x] Gate weights visualization
+[~] Integrated Gradients (MỚI)
+[x] Triple-validation: Gate vs IG vs Ablation (MỚI)
+[x] σ_k analysis (MỚI)
+[x] Alpha blend analysis (MỚI)
+[x] Risk profile heatmap
 [ ] SHAP cross-check
 ```
 

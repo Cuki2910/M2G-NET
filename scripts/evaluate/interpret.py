@@ -17,21 +17,10 @@ import matplotlib
 matplotlib.use("Agg")   # non-interactive backend
 
 import config as cfg
-from src.data_pipeline import load_data, get_loaders
-from src.model import TGMVMTGFNetV2
-from src.loss  import UncertaintyWeightedLoss
+from src.checkpoint import load_model_bundle
+from src.data_pipeline import get_loaders
 
 os.makedirs("outputs", exist_ok=True)
-
-
-def load_best_model(vocab):
-    model   = TGMVMTGFNetV2(vocab)
-    loss_fn = UncertaintyWeightedLoss()
-    ckpt    = torch.load(cfg.CHECKPOINT_PATH, map_location="cpu", weights_only=False)
-    model.load_state_dict(ckpt["model_state"])
-    loss_fn.load_state_dict(ckpt["loss_state"])
-    model.eval()
-    return model, loss_fn
 
 
 def extract_gate_weights(model, loader):
@@ -85,10 +74,11 @@ def alpha_report(model):
 
 
 if __name__ == "__main__":
-    train_df, val_df, test_df, encoders, vocab = load_data()
+    bundle = load_model_bundle()
+    train_df, val_df, test_df = bundle["train_df"], bundle["val_df"], bundle["test_df"]
+    vocab = bundle["vocab"]
     _, _, test_loader = get_loaders(train_df, val_df, test_df, vocab)
-
-    model, loss_fn = load_best_model(vocab)
+    model, loss_fn = bundle["model"], bundle["loss_fn"]
 
     avg_gates = extract_gate_weights(model, test_loader)
     print("\n=== Gate Weights (avg over test set) ===")

@@ -1,6 +1,8 @@
-# TG-MVMT-GFNet v2
+# M2G-Net v2
 
-Theory-Guided Multi-View Multi-Task Gated Fusion Network for motorcycle risky behavior prediction.
+Incorporating Behavioral Theory into Deep Learning: A Multi-View Multi-Task Gated Fusion Network (M2G-Net) for motorcycle risky behavior prediction.
+
+Guided by transportation behavioral models (e.g., Theory of Planned Behavior), this architecture models the complex interaction between rider characteristics and environmental context. This research provides an interpretable tool capable of handling missing observation labels, aiming to support policymakers in designing safer intersections and optimizing traffic enforcement.
 
 This repository contains a research implementation for training, evaluating, comparing baselines, and generating explanation analyses for multi-task behavioral prediction.
 
@@ -13,12 +15,14 @@ python baselines/run_all_baselines.py
 python scripts/evaluate/ablation.py
 python scripts/evaluate/test_on_independent_set.py
 python scripts/evaluate/repeated_runs_significance.py
+python scripts/evaluate/interpret.py              # Gate weights analysis
+python scripts/explain/ig_explain.py              # Integrated Gradients attribution
 python scripts/explain/visualize.py
 ```
 
 ## Architecture
 
-TG-MVMT-GFNet uses:
+M2G-Net uses:
 1. **Five view-specific encoders:** Rider role, rider traits, road context, environment, and site-aware context.
 2. **Cross-level interaction:** Blends individual and contextual representations.
 3. **Gated fusion:** Task-specific gated fusion with temperature annealing.
@@ -34,7 +38,7 @@ src/
   fusion.py            task-specific gated fusion
   loss.py              masked uncertainty-weighted loss
   metrics.py           masked metrics
-  model.py             TG-MVMT-GFNet v2 model
+  model.py             M2G-Net v2 model
 
 scripts/
   train.py             Main training pipeline
