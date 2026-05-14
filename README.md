@@ -1,8 +1,8 @@
 # M2G-Net v2
 
-Incorporating Behavioral Theory into Deep Learning: A Multi-View Multi-Task Gated Fusion Network (M2G-Net) for motorcycle risky behavior prediction.
+Incorporating behavioral theory into deep learning: a Multi-View Multi-Task Gated Fusion Network (M2G-Net) for motorcycle risky-behavior prediction.
 
-Guided by transportation behavioral models (e.g., Theory of Planned Behavior), this architecture models the complex interaction between rider characteristics and environmental context. This research provides an interpretable tool capable of handling missing observation labels, aiming to support policymakers in designing safer intersections and optimizing traffic enforcement.
+Guided by transportation behavioral models (e.g., Theory of Planned Behavior), this architecture models interactions between rider characteristics and environmental context. The current repository should be treated as a **synthetic proof-of-concept** unless the data are replaced by real observational records. Its strongest current claim is methodological feasibility for theory-guided multi-view modeling, not deployed policy support or real-world safety impact.
 
 This repository contains a research implementation for training, evaluating, comparing baselines, and generating explanation analyses for multi-task behavioral prediction.
 
@@ -54,4 +54,8 @@ docs/                  Mathematical formulations and architecture visual
 
 - **Architecture:** `docs/ARCHITECTURE_VISUALIZATION.md`
 - **Math Formulas:** `docs/MATHEMATICAL_FORMULAS.md`
+- **Methods & Terms Glossary:** `docs/METHODS_TERMS_GLOSSARY.md`
+- **Competing Methods Research:** `docs/METHOD_COMPETITORS_RESEARCH.md`
+- **Strong Baseline Repeated Runs:** `docs/STRONG_BASELINE_REPEATED_RUNS_RESULTS.md`
+- **Current Metrics:** `docs/results/current_metrics.md`
 - **Results:** `docs/INDEPENDENT_TEST_RESULTS.md`

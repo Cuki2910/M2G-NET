@@ -19,6 +19,11 @@ try:
     LIGHTGBM_AVAILABLE = True
 except ImportError:
     LIGHTGBM_AVAILABLE = False
+try:
+    from catboost import CatBoostClassifier
+    CATBOOST_AVAILABLE = True
+except ImportError:
+    CATBOOST_AVAILABLE = False
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -209,6 +214,16 @@ if __name__ == "__main__":
 
     results["early_fusion_mlp"] = run_early_fusion_mlp(trainval_df, test_df)
     results["single_task_mlp"]  = run_single_task_mlp(trainval_df, test_df)
+
+    if CATBOOST_AVAILABLE:
+        results["catboost"] = run_sklearn_baseline(
+            CatBoostClassifier,
+            {"iterations": 100, "learning_rate": 0.05, "depth": 6,
+             "loss_function": "Logloss", "random_seed": cfg.RANDOM_SEED,
+             "verbose": False, "allow_writing_files": False},
+            trainval_df, test_df, "CatBoost")
+    else:
+        print("\n[WARN] catboost is not installed; skipping CatBoost baseline.")
 
     # Summary table
     print("\n\n=== BASELINE SUMMARY (Macro ROC-AUC) ===")

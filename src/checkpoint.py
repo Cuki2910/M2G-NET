@@ -24,6 +24,31 @@ from src.loss import UncertaintyWeightedLoss
 from src.model import TGMVMTGFNetV2
 
 
+MODEL_CONFIG_KEYS = {
+    "view_dim": "VIEW_DIM",
+    "interaction_dim": "INTERACTION_DIM",
+    "num_tasks": "NUM_TASKS",
+    "num_views": "NUM_VIEWS",
+    "num_gate_inputs": "NUM_GATE_INPUTS",
+    "temperature_init": "TEMPERATURE_INIT",
+    "temperature_final": "TEMPERATURE_FINAL",
+    "gate_prior_weight": "GATE_PRIOR_WEIGHT",
+    "dropout_rate": "DROPOUT_RATE",
+}
+
+
+def current_model_config():
+    """Return the config values needed to reproduce checkpoint inference."""
+    return {
+        key: (
+            int(getattr(cfg, cfg_name))
+            if isinstance(getattr(cfg, cfg_name), int)
+            else float(getattr(cfg, cfg_name))
+        )
+        for key, cfg_name in MODEL_CONFIG_KEYS.items()
+    }
+
+
 def _site_mapping_for_checkpoint(site_mapping):
     return {str(int(site_id)): int(encoded_id) for site_id, encoded_id in site_mapping.items()}
 
@@ -45,6 +70,7 @@ def make_checkpoint_payload(epoch, model, loss_fn, val_auc, vocab, encoders=None
         "data_path": str(data_path),
         "target_cols": list(cfg.TARGET_COLS),
         "site_id_col": cfg.SITE_ID_COL,
+        "model_config": current_model_config(),
     }
     if thresholds is not None:
         payload["thresholds"] = {
@@ -63,6 +89,53 @@ def make_checkpoint_payload(epoch, model, loss_fn, val_auc, vocab, encoders=None
 
 def load_checkpoint(checkpoint_path=cfg.CHECKPOINT_PATH, map_location="cpu"):
     return torch.load(checkpoint_path, map_location=map_location, weights_only=True)
+
+
+def _validate_architecture_config(saved_config):
+    """Fail fast when a checkpoint needs a different model architecture."""
+    if not saved_config:
+        return []
+
+    current = current_model_config()
+    architecture_keys = [
+        "view_dim",
+        "interaction_dim",
+        "num_tasks",
+        "num_views",
+        "num_gate_inputs",
+        "dropout_rate",
+    ]
+    mismatches = []
+    for key in architecture_keys:
+        if key in saved_config and saved_config[key] != current[key]:
+            mismatches.append((key, saved_config[key], current[key]))
+    if mismatches:
+        details = ", ".join(
+            f"{key}: checkpoint={saved}, current={current_value}"
+            for key, saved, current_value in mismatches
+        )
+        raise ValueError(
+            "Checkpoint model architecture does not match current config. "
+            f"Mismatches: {details}."
+        )
+    return mismatches
+
+
+def apply_checkpoint_model_config(model, ckpt):
+    """
+    Apply non-state-dict model settings stored in a checkpoint.
+
+    Older checkpoints do not contain model_config; in that case the current
+    config is used for backward compatibility.
+    """
+    saved_config = ckpt.get("model_config") or {}
+    _validate_architecture_config(saved_config)
+
+    prior_weight = saved_config.get("gate_prior_weight")
+    if prior_weight is not None:
+        for gate in model.fusion.gates:
+            gate.prior_weight = float(prior_weight)
+    return model
 
 
 def splits_from_checkpoint(ckpt, data_path=None):
@@ -89,6 +162,7 @@ def load_model_bundle(checkpoint_path=cfg.CHECKPOINT_PATH, data_path=None, map_l
 
     model = TGMVMTGFNetV2(vocab)
     loss_fn = UncertaintyWeightedLoss()
+    apply_checkpoint_model_config(model, ckpt)
     model.load_state_dict(ckpt["model_state"])
     loss_fn.load_state_dict(ckpt["loss_state"])
     model.eval()

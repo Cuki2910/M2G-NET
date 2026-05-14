@@ -53,8 +53,8 @@ Cross-level interaction
         |
         v
 Task-specific gated fusion
-  alpha_raw_k = softmax((A_k r + c_k) / T)
-  alpha_k = (alpha_raw_k + lambda * uniform_prior) / (1 + lambda)
+  alpha_raw_k = sparsemax((A_k r + c_k) / T)
+  alpha_k = (1 - lambda) * alpha_raw_k + lambda * uniform_prior
   z_gated_k = sum_j alpha_kj * h_tilde_j
         |
         v

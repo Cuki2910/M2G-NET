@@ -16,6 +16,9 @@ from src.fusion      import ResidualGatedFusion
 
 
 class OutputHead(nn.Module):
+    # Sigmoid is intentionally baked in: loss.py uses F.binary_cross_entropy (expects
+    # probabilities) and calibration.py recovers logits via logit(clipped_probs).
+    # Do NOT switch to BCEWithLogitsLoss without updating both consumers.
     def __init__(self, input_dim=cfg.VIEW_DIM):
         super().__init__()
         self.head = nn.Sequential(nn.Linear(input_dim, 1), nn.Sigmoid())

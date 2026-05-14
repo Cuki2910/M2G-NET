@@ -4,6 +4,7 @@ pandas
 scikit-learn
 xgboost
 lightgbm
+catboost
 matplotlib
 seaborn
 captum

@@ -1,6 +1,9 @@
 """
 Phase 7: Metrics
 ROC-AUC, PR-AUC, F1, Balanced Accuracy, and MTL Transfer Ratio.
+
+Statistical significance functions (95% CI, paired t-test) are in
+scripts/evaluate/repeated_runs_significance.py, which extends this module.
 """
 
 import numpy as np
@@ -147,6 +150,27 @@ def tune_task_thresholds(all_targets, all_probs, all_masks=None, metric="f1",
         thresholds[task] = float(grid[int(np.argmax(scores))])
 
     return thresholds
+
+
+def lso_summary(fold_aucs, g_random=None):
+    """
+    Compute leave-site-out summary statistics (MATHEMATICAL_FORMULAS.md §LSO).
+
+    G_bar_LSO = mean of fold AUCs
+    s_G       = std dev (ddof=1) of fold AUCs
+    delta_site = g_random - G_bar_LSO  (only if g_random is provided)
+
+    Returns a dict with keys: G_bar_LSO, s_G, n_folds, delta_site (or None).
+    """
+    aucs = np.asarray(fold_aucs, dtype=float)
+    g_bar = float(np.mean(aucs))
+    s_g   = float(np.std(aucs, ddof=1)) if len(aucs) > 1 else 0.0
+    return {
+        "G_bar_LSO":  g_bar,
+        "s_G":        s_g,
+        "n_folds":    len(aucs),
+        "delta_site": float(g_random - g_bar) if g_random is not None else None,
+    }
 
 
 def mtl_transfer_ratio(mtl_results, single_results):

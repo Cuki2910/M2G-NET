@@ -272,4 +272,4 @@ if __name__ == "__main__":
     compare_with_baselines()
 
     print(f"\nTG-MVMT-GFNet v2 Macro ECE: {macro_ece:.4f}")
-    print("\n✓ Calibration analysis complete.")
+    print("\nCalibration analysis complete.")

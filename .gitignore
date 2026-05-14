@@ -20,5 +20,7 @@ env/
 # Project specific ignores
 checkpoints/
 outputs/
+data/state_store.db/
+nul
 *.pdf
 .claude/

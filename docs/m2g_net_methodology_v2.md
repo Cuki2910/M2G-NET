@@ -615,7 +615,7 @@ Một fusion gate chung cho tất cả task sẽ bỏ qua sự khác biệt này
 
 **Vấn đề với gate thuần:** softmax weights không ổn định và nhạy cảm với initialization — có thể collapse vào một view ngay từ đầu (mode collapse), làm các view khác không được học.
 
-**Giải pháp: temperature + post-softmax prior smoothing**
+**Giải pháp: temperature + sparsemax uniform prior mixing**
 
 ```python
 # Thay vì:
@@ -623,8 +623,8 @@ alpha_t = softmax(W_gate_t @ concat(H_full))
 
 # Dùng:
 logits_t = W_gate_t @ concat(H_full)
-alpha_raw_t = softmax(logits_t / temperature)
-alpha_t = (alpha_raw_t + lambda_prior * uniform_prior) / (1 + lambda_prior)
+alpha_raw_t = sparsemax(logits_t / temperature)
+alpha_t = (1 - lambda_prior) * alpha_raw_t + lambda_prior * uniform_prior
 
 # uniform_prior = vector đều tạo lower bound nhẹ cho mỗi gate input
 # temperature: annealed từ cao xuống thấp trong training

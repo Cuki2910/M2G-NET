@@ -188,11 +188,13 @@ def evaluate_leave_intersection_out(raw_df, max_epochs=50, patience=10, min_test
 
     if not lio_aucs:
         raise RuntimeError("No finite leave-intersection-out ROC-AUC values were produced.")
+    from src.metrics import lso_summary
+    summary = lso_summary(lio_aucs)
     return {
-        "macro_roc_auc_mean": float(np.mean(lio_aucs)),
-        "macro_roc_auc_std": float(np.std(lio_aucs)),
-        "n_folds": len(lio_aucs),
-        "fold_aucs": lio_aucs,
+        "macro_roc_auc_mean": summary["G_bar_LSO"],
+        "macro_roc_auc_std":  summary["s_G"],
+        "n_folds":            summary["n_folds"],
+        "fold_aucs":          lio_aucs,
     }
 
 

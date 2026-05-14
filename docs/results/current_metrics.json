@@ -1,0 +1,82 @@
+{
+  "timestamp": "2026-05-14T10:32:00Z",
+  "data_status": "synthetic proof-of-concept unless replaced by real observational data",
+  "current_model": "TG-MVMT-GFNet v2 with sparsemax uniform prior mixing",
+  "single_split_after_retrain": {
+    "test_macro_roc_auc": 0.709476641425085,
+    "test_macro_pr_auc": 0.2893798584702577,
+    "test_tuned_macro_f1": 0.38516146511954075,
+    "test_tuned_macro_balanced_accuracy": 0.6673265074477904,
+    "test_macro_ece_before_temperature_scaling": 0.14641617532233686,
+    "test_macro_ece_after_temperature_scaling": 0.013534533403063648,
+    "temperature": 0.37803991922217967,
+    "independent_macro_roc_auc": 0.7248044859862762,
+    "independent_macro_pr_auc": 0.2784950058956754,
+    "independent_tuned_macro_f1": 0.3848237852238872,
+    "independent_tuned_macro_balanced_accuracy": 0.6805529388299814
+  },
+  "repeated_runs_strong_baselines": {
+    "n_runs": 5,
+    "seeds": [42, 101, 2023, 777, 999],
+    "metric": "macro_roc_auc",
+    "m2g_net": {
+      "mean": 0.730273769583196,
+      "ci95_lower": 0.7141370438041311,
+      "ci95_upper": 0.7464104953622609,
+      "scores": [0.711178161864662, 0.7334409841057177, 0.7329142921612759, 0.72677720361943, 0.7470582061648943]
+    },
+    "xgboost": {
+      "mean": 0.6795785242906076,
+      "ci95_lower": 0.6644280630779422,
+      "ci95_upper": 0.694728985503273,
+      "mean_delta_m2g_minus_baseline": 0.0506952452925884,
+      "paired_ttest_t_statistic": 8.11321357603249,
+      "paired_ttest_p_value": 0.0012549499065057665,
+      "scores": [0.6656656442919985, 0.6741714000324782, 0.6984817017932036, 0.6825534893812446, 0.6770203859541126]
+    },
+    "lightgbm": {
+      "mean": 0.7181869603639617,
+      "ci95_lower": 0.701517870666273,
+      "ci95_upper": 0.7348560500616503,
+      "mean_delta_m2g_minus_baseline": 0.012086809219234329,
+      "paired_ttest_t_statistic": 5.07411823300617,
+      "paired_ttest_p_value": 0.007109903608249487,
+      "scores": [0.6996213413573186, 0.7193030891205228, 0.7298151082725965, 0.7105426532904173, 0.7316526097789533]
+    },
+    "random_forest": {
+      "mean": 0.6706192223231148,
+      "ci95_lower": 0.6602956063849272,
+      "ci95_upper": 0.6809428382613023,
+      "mean_delta_m2g_minus_baseline": 0.05965454726008124,
+      "paired_ttest_t_statistic": 11.435226389185164,
+      "paired_ttest_p_value": 0.000333694498472334,
+      "scores": [0.6587861001610491, 0.6700365696435022, 0.6814763303879373, 0.6743191018712583, 0.6684780095518271]
+    },
+    "catboost": {
+      "mean": 0.7309732639300542,
+      "ci95_lower": 0.7156599556827663,
+      "ci95_upper": 0.7462865721773422,
+      "mean_delta_m2g_minus_baseline": -0.0006994943468582315,
+      "paired_ttest_t_statistic": -0.4382613054178546,
+      "paired_ttest_p_value": 0.6838261533709449,
+      "scores": [0.7120765940632722, 0.7350428699972966, 0.7387377033169987, 0.7258579512346575, 0.7431512010380463]
+    }
+  },
+  "single_split_baselines": {
+    "catboost_macro_roc_auc": 0.7121,
+    "early_fusion_mlp_macro_roc_auc": 0.7085,
+    "decision_tree_macro_roc_auc": 0.7069,
+    "single_task_mlp_macro_roc_auc": 0.7013,
+    "lightgbm_macro_roc_auc": 0.6996,
+    "xgboost_macro_roc_auc": 0.6657,
+    "random_forest_macro_roc_auc": 0.6588,
+    "logistic_regression_macro_roc_auc": 0.6461
+  },
+  "interpretation_limits": [
+    "Do not claim real-world external validation from synthetic outputs.",
+    "CatBoost and M2G-Net are statistically tied on this synthetic repeated-run benchmark; do not claim M2G-Net superiority over CatBoost.",
+    "Use gate weights only as supplementary attention diagnostics; prioritize ablation and attribution for predictive-importance claims.",
+    "Uncalibrated probabilities remain poorly calibrated; report temperature-scaled ECE for calibrated probability use.",
+    "Strong baselines use fixed hyperparameters; tune XGBoost, LightGBM, Random Forest, and CatBoost before publication-grade claims."
+  ]
+}

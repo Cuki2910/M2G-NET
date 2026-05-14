@@ -66,7 +66,7 @@ INTERACTION_DIM = 16  # output dim of h_inter
 NUM_GATE_INPUTS       = 6       # 5 views + 1 interaction term
 TEMPERATURE_INIT      = 2.0     # annealed → 1.0 over training
 TEMPERATURE_FINAL     = 1.0
-GATE_PRIOR_WEIGHT     = 0.1     # lambda for post-softmax uniform prior smoothing
+GATE_PRIOR_WEIGHT     = 0.1     # convex weight for sparsemax uniform prior mixing
 
 # ── Training ──────────────────────────────────────────────────────────────────
 LEARNING_RATE          = 1e-3

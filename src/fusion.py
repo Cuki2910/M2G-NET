@@ -1,13 +1,11 @@
 """
 Phase 4: Regularized Task-Specific Gated Fusion + Residual Early Fusion
-- RegularizedTaskGate: sparsemax with temperature scaling (sparse attention, no prior smoothing)
+- RegularizedTaskGate: sparsemax with temperature scaling and uniform prior mixing
 - ResidualGatedFusion: z_k = sigmoid(a) * z_gated^(k) + (1-sigmoid(a)) * z_early  (learnable a)
 """
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 import config as cfg
@@ -36,14 +34,33 @@ class RegularizedTaskGate(nn.Module):
     """
     One gate per task.
     Divides logits by a learnable temperature to control attention sharpness.
-    Uses sparsemax instead of softmax + prior smoothing to natively filter noise.
+    Applies uniform prior smoothing: alpha = (1-lam)*sparsemax(logits/T) + lam/K
+    This reduces cross-seed variance (gate instability). When lam > 0, exact
+    sparse zeros become a positive lower bound of lam/K.
     """
 
     def __init__(self, num_inputs, input_dim,
-                 temperature_init=cfg.TEMPERATURE_INIT):
+                 temperature_init=cfg.TEMPERATURE_INIT,
+                 prior_weight=cfg.GATE_PRIOR_WEIGHT):
         super().__init__()
-        self.gate        = nn.Linear(num_inputs * input_dim, num_inputs)
-        self.temperature = nn.Parameter(torch.tensor(float(temperature_init)))
+        self.gate         = nn.Linear(num_inputs * input_dim, num_inputs)
+        # T is declared as nn.Parameter for checkpoint compatibility but is NOT
+        # gradient-learned. scripts/train.py::anneal_temperature() overwrites
+        # .data each epoch via cosine schedule (TEMPERATURE_INIT -> TEMPERATURE_FINAL).
+        self.temperature  = nn.Parameter(torch.tensor(float(temperature_init)))
+        self.prior_weight = float(prior_weight)
+        self.num_inputs   = num_inputs
+
+    @property
+    def prior_weight(self):
+        return self._prior_weight
+
+    @prior_weight.setter
+    def prior_weight(self, value):
+        value = float(value)
+        if not 0.0 <= value <= 1.0:
+            raise ValueError("prior_weight must be in the range [0, 1].")
+        self._prior_weight = value
 
     def forward(self, view_reps):
         """
@@ -51,9 +68,13 @@ class RegularizedTaskGate(nn.Module):
         returns alpha: (batch, num_inputs)
         """
         h = torch.cat(view_reps, dim=-1)                            # (batch, num_inputs*dim)
-        logits = self.gate(h)
-        temp   = self.temperature.clamp(min=0.1)                    # avoid division by zero
-        alpha  = sparsemax(logits / temp, dim=-1)                   # (batch, num_inputs)
+        logits       = self.gate(h)
+        temp         = self.temperature.clamp(min=0.1)
+        alpha_sparse = sparsemax(logits / temp, dim=-1)             # (batch, num_inputs)
+        # Uniform prior smoothing: pulls extreme sparse weights toward 1/K,
+        # reducing cross-seed variance while keeping relative importance ordering.
+        K     = logits.size(-1)
+        alpha = (1.0 - self.prior_weight) * alpha_sparse + self.prior_weight / K
         return alpha
 
 
@@ -73,7 +94,8 @@ class ResidualGatedFusion(nn.Module):
 
         # Task-specific gates (operate on 5 views + interaction = num_gate_inputs)
         self.gates = nn.ModuleList([
-            RegularizedTaskGate(num_gate_inputs, gate_input_dim)
+            RegularizedTaskGate(num_gate_inputs, gate_input_dim,
+                                prior_weight=cfg.GATE_PRIOR_WEIGHT)
             for _ in range(num_tasks)
         ])
 

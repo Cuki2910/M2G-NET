@@ -1,7 +1,7 @@
 # Gate Prior Smoothing Sweep Results
 
-This report records the first controlled sweep of the post-softmax gate prior
-smoothing strength introduced for M2G-Net v2.
+This report records the first controlled sweep of the sparsemax uniform gate
+prior mixing strength introduced for M2G-Net v2.
 
 ## Setup
 
@@ -17,11 +17,11 @@ The smoothing formula is:
 \[
     \alpha_k^{\mathrm{raw}}
     =
-    \operatorname{softmax}\left(\frac{A_k r + c_k}{T}\right),
+    \operatorname{sparsemax}\left(\frac{A_k r + c_k}{T}\right),
     \qquad
     \alpha_k
     =
-    \frac{\alpha_k^{\mathrm{raw}}+\lambda p_0}{1+\lambda}.
+    (1-\lambda)\alpha_k^{\mathrm{raw}}+\lambda p_0.
 \]
 
 ## Summary

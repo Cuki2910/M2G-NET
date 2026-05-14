@@ -72,10 +72,14 @@ def main():
     print(f"  Max AUC (best)  : {max(fold_aucs):.4f}")
     print("=" * 60)
 
-    assessment = "Good" if mean_auc >= 0.70 else "Acceptable" if mean_auc >= 0.65 else "Poor"
+    from src.metrics import lso_summary
+    G_RANDOM = 0.7115
+    lso = lso_summary(fold_aucs, g_random=G_RANDOM)
+
+    assessment = "Good" if lso["G_bar_LSO"] >= 0.70 else "Acceptable" if lso["G_bar_LSO"] >= 0.65 else "Poor"
     print(f"\nAssessment: {assessment}")
-    print(f"Comparison: random-split test AUC = 0.7115")
-    print(f"Leave-site-out mean AUC = {mean_auc:.4f} (gap = {0.7115 - mean_auc:+.4f})")
+    print(f"Comparison: random-split test AUC = {G_RANDOM}")
+    print(f"Leave-site-out mean AUC = {lso['G_bar_LSO']:.4f} (gap = {lso['delta_site']:+.4f})")
 
     csv_path = "outputs/leave_site_out_results.csv"
     pd.DataFrame({"fold": range(n_folds), "macro_roc_auc": fold_aucs}).to_csv(csv_path, index=False)

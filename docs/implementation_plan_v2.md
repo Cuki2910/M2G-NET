@@ -277,8 +277,8 @@ H_full = {h_role, h_trait, h_road, h_env, h_site, h_inter}  (6 inputs)
 
 Với mỗi task t:
   logits_t = W_gate_t · concat(H_full)
-  α_raw_t = softmax(logits_t / temperature)
-  α_t = (α_raw_t + λ · uniform_prior) / (1 + λ)
+  α_raw_t = sparsemax(logits_t / temperature)
+  α_t = (1 - λ) · α_raw_t + λ · uniform_prior
   z_t_gated = Σ_v α_t_v · h_v
 
   z_t_early = MLP_early(concat(h_role, h_trait, h_road, h_env, h_site))
@@ -288,17 +288,20 @@ Với mỗi task t:
 
 ```python
 class RegularizedTaskGate(nn.Module):
-    def __init__(self, num_inputs, input_dim, temperature_init=2.0):
+    def __init__(self, num_inputs, input_dim, temperature_init=2.0, prior_weight=0.1):
         super().__init__()
         self.gate = nn.Linear(num_inputs * input_dim, num_inputs)
         self.temperature = nn.Parameter(torch.tensor(temperature_init))
-        self.register_buffer('prior', torch.ones(num_inputs) / num_inputs)
+        if not 0.0 <= prior_weight <= 1.0:
+            raise ValueError("prior_weight must be in the range [0, 1].")
+        self.prior_weight = prior_weight
 
     def forward(self, view_reps):
         h_concat = torch.cat(view_reps, dim=-1)
         logits = self.gate(h_concat)
-        alpha = F.softmax(logits / self.temperature.clamp(min=0.1), dim=-1)
-        alpha = (alpha + cfg.GATE_PRIOR_WEIGHT * self.prior) / (1.0 + cfg.GATE_PRIOR_WEIGHT)
+        alpha_sparse = sparsemax(logits / self.temperature.clamp(min=0.1), dim=-1)
+        K = logits.size(-1)
+        alpha = (1.0 - cfg.GATE_PRIOR_WEIGHT) * alpha_sparse + cfg.GATE_PRIOR_WEIGHT / K
         return alpha
 
 
