@@ -99,3 +99,8 @@ Build: 7 pages (within 6-8), 20/20 cites, no undefined refs. Anonymity/originali
 - 6 refs added (Lakshminarayanan 2017, Grinsztajn 2022, Gorishniy 2021, Guo & Berkhahn 2016, Rendle 2010, Little & Rubin 2019); 25/25 bibitems cited. Little & Rubin content and Guo & Berkhahn venue not verified; abstracts only for the arXiv papers.
 - Data/code availability narrowed to what is actually provided. WARNING: scripts/generate_paper_simulation.py, scripts/summarize_paper_results.py, scripts/evaluate/paper_pipeline.py, scripts/run_extension.py, docs/paper/generator-spec.md and docs/paper/extension-v3/*.csv are currently UNTRACKED in git; they must be committed for the availability statement to be true.
 - Build: tectonic, 7 pages (CFP limit 6-8 per earlier audit). Not run: single-vs-ensemble M2G-NET ablation; nothing committed.
+
+## External-review fixes (2026-11-15)
+- Removed the sign-probability sentence (2x0.5^20): it is an exact two-sided sign test in all but name, and the paper reports no significance tests. Paired 95% t-intervals and positive counts stay; the CI example now names its setting (interaction / partial-label) and says the intervals are Monte Carlo uncertainty over 20 datasets of one generator.
+- "All 600 fits" -> "600 planned procedure--dataset--seed evaluations" (M2G-NET is a 5-member ensemble; classical procedures select hyperparameters per task).
+- Availability check by curl (raw.githubusercontent.com): `scripts/generate_paper_simulation.py` and `scripts/evaluate/paper_pipeline.py` return 404 on `main` and 200 on `research/dataset-alternatives-2026-11-10`. The paper links the repository root (default branch main), so the claim is NOT yet true for a reader who follows the link. Open: merge to main or pin the link to a branch/commit.
