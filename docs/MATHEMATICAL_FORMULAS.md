@@ -169,6 +169,22 @@ z_{\mathrm{gated}}^{(k)}
 \sum_{j=1}^{V+1}\alpha_{k,j}\tilde{h}_j .
 \]
 
+### Development gate variants (v3 gate search)
+
+The default `legacy` gate above is unchanged. `nonlinear` and
+`nonlinear_task_blend` replace only its affine logits with
+\[
+q_k=B_{2,k}\,\operatorname{GELU}(B_{1,k}r+b_{1,k})+b_{2,k},
+\quad B_{1,k}\in\mathbb R^{H\times Jd},\quad
+B_{2,k}\in\mathbb R^{J\times H},
+\]
+where \(J\) is the number of active gate inputs and
+\(H=\texttt{V3\_GATE\_HIDDEN\_DIM}\). Apply the same sparsemax to
+\(q_k/T\), then the same uniform prior mixing. For finite inputs,
+\(T\ge0.1\) and \(0\le\lambda\le1\), the weights have shape
+\([B,J]\), sum to one, and satisfy \(\alpha_{k,j}\ge\lambda/J\).
+These optional variants do not apply to `early_fusion` (no gated path).
+
 ## 5. Residual Early-Fusion Blending
 
 The early-fusion baseline representation is
@@ -188,7 +204,12 @@ z_k
 \left(1-\operatorname{sigmoid}(a)\right)z_{\mathrm{early}},
 \]
 where \(a\in\mathbb{R}\) is a shared scalar learned jointly with the model
-parameters.
+parameters. The development `task_blend` and `nonlinear_task_blend` variants
+instead learn \(a\in\mathbb R^K\) and use \(\operatorname{sigmoid}(a_k)\)
+for task \(k\) in both terms. Both scalar and vector start at zero (blend
+0.5); the vector has separate task gradients and is not training-equivalent
+to the shared scalar. The returned blend is scalar for `legacy`/`nonlinear`
+and shape \([K]\) for task-specific blending.
 
 ## 6. Task Prediction
 
@@ -199,6 +220,17 @@ For each task \(k\), the prediction head produces a binary probability:
 \operatorname{sigmoid}\!\left(w_k^{\top}z_k+\beta_k\right),
 \qquad k=1,\ldots,K .
 \]
+
+**m2g_net_v3 option (`V3_INTERACTION_SKIP`, default off).** When enabled, the interaction
+representation also enters each logit directly, bypassing the gate and the blend:
+\[
+\hat{y}_k
+=
+\operatorname{sigmoid}\!\left(w_k^{\top}z_k+\beta_k+s_k^{\top}h_{\mathrm{int}}\right),
+\qquad s_k\in\mathbb{R}^{d},\; s_k=0 \text{ at initialisation}.
+\]
+With \(s_k=0\) the model equals the formula above. The option requires the interaction
+and gated paths (not the `no_interaction` or `early_fusion` ablations).
 
 ## 7. Training Objective
 
@@ -247,14 +279,47 @@ The implemented loss skips task \(k\) in mini-batches where \(M_k=0\):
   m_k^{(n)}
   \left[
   \frac{1}{2}\exp(-s_k)\ell_k^{(n)}
-- \frac{1}{2}s_k
++ \frac{1}{2}s_k
   \right].
   \]
   This is not generally equivalent to the implemented normalized objective,
   because it scales each task by \(M_k\) and gives the uncertainty term one
   contribution per observed label rather than one contribution per active task.
-  Optional focal loss and positive-class weighting are implemented but disabled
-  by default in the current configuration.
+  Focal loss is enabled and positive-class weighting is disabled in the current
+  configuration. The `m2g_net_v3` variant keeps every
+  equation in Sections 1-6 and 8, replaces the focal term by the plain binary
+  cross-entropy \(\ell_k^{(n)}\) above (`V3_USE_FOCAL_LOSS=False`), and averages
+  \(M=\)`V3_ENSEMBLE_SIZE` independently initialized members in probability space:
+  \[
+  \hat y_k^{\mathrm{v3}}=\frac1M\sum_{m=1}^{M}\hat y_k^{(m)},\qquad
+  \operatorname{seed}_m=\operatorname{seed}+m\cdot\texttt{V3\_MEMBER\_SEED\_OFFSET}.
+  \]
+  Each member early-stops on its own validation macro ROC-AUC; the ensemble
+  validation AUC is reported but not used to select among variants. Targets are indexed by the observation mask before evaluating
+  BCE/focal loss so missing NaNs cannot contaminate the objective.
+
+### Controlled retrained ablations
+
+The default architecture and objective above are unchanged. Every ablation is
+trained from a fresh initialization on matched train/validation/test rows:
+
+- `no_interaction`: omit the interaction input and its projection from the gate,
+  leaving five normalized gate weights; retain early fusion over five views.
+- `no_site`: replace the site representation with zero before both interaction
+  and early fusion, and omit that view from the gate (five remaining inputs).
+- `shared_gate`: tie the gate across tasks; preserve task-specific output heads.
+- `early_fusion`: use only the early-fusion path, without gated fusion.
+- `no_uncertainty`: replace the uncertainty-weighted sum with the sum of masked
+  mean task losses, with no learned uncertainty contribution.
+- `complete_case`: retain only fully observed training and validation records;
+  evaluate on the original masked test set. This comparator never relabels
+  missing outcomes as observed negatives and also changes sample size.
+
+Calibration temperature is fitted on observed validation outcomes only.
+Decision thresholds are selected from those calibrated validation probabilities,
+then held fixed when transforming and classifying test probabilities. Both raw
+and calibrated metrics are reported. Site-out validation uses sites disjoint
+from training and disables site-specific embeddings in validation and test.
 
 ## 8. Optimization
 

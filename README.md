@@ -47,6 +47,30 @@ See `docs/PUBLISH_READINESS.md`; pipeline repair completion is not submission re
 On macOS, XGBoost/LightGBM need an OpenMP runtime (`brew install libomp`).
 When unavailable, choose `--models m2g_net catboost logistic_regression`.
 
+## Reproducing the FJCAI results
+
+Synthetic data only. Run from the repo root with the project virtualenv (`.venv/bin/python`; the runners call it by that path).
+
+```bash
+pip install -r requirements.txt
+python -m unittest discover -s tests            # or: pytest tests
+
+# 1. One synthetic dataset (mechanism: additive | interaction | partial; evaluation seeds are 1711-1730)
+python scripts/generate_paper_simulation.py --seed 1711 --mechanism interaction --output outputs/demo/interaction-1711
+
+# 2. Locked test: 20 seeds x 3 mechanisms x 2 training seeds x 9 models = 1080 fits (hours; the paper reports 5 of the 9 models)
+#    Sources are checked against docs/paper/extension-v3/FREEZE.json first; any edited frozen file aborts the run.
+python scripts/run_extension_v3.py run --confirmed-locked-test --workers 4
+python scripts/run_extension_v3.py score        # writes docs/paper/extension-v3/{results,per-set,summary}-locked.csv, criteria.csv
+
+# 3. Paper numbers and figures (use the committed CSVs; no refit)
+python scripts/figures/paired_auc_ci.py             # paired 95% CIs -> paired-auc-ci.csv
+python scripts/figures/comparator_seed_ensemble.py  # needs outputs/paper-v3-locked predictions from step 2
+python scripts/figures/fig3_paired_auc_locked.py
+```
+
+Not in the repo: raw predictions and fit logs (`outputs/`, ignored by git), so step 3's seed-average script and a rescore need step 2 first. Step 2 re-fits everything; results can differ slightly across hardware and library versions. `docs/paper/extension-v3/FREEZE.json` records the configuration and hashes fixed before the locked test. Details: `docs/paper/extension-v3/PLAN.md`.
+
 ## Architecture
 
 M2G-Net uses:
