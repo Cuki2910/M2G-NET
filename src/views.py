@@ -64,6 +64,7 @@ class SiteAwareEncoder(nn.Module):
         h_obs = self.obs_encoder(site_obs)                          # (batch, d)
         if use_intercept:
             h_rand = self.site_intercept(site_id)                   # (batch, d)
+            h_rand = h_rand.masked_fill(site_id.eq(self.site_intercept.num_embeddings - 1).unsqueeze(-1), 0)
         else:
             h_rand = torch.zeros_like(h_obs)                        # zero-out for unseen sites
         return self.proj(torch.cat([h_obs, h_rand], dim=-1))        # (batch, d)

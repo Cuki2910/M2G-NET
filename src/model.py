@@ -37,8 +37,20 @@ class TGMVMTGFNetV2(nn.Module):
       OutputHeads × 4
     """
 
-    def __init__(self, vocab):
+    def __init__(self, vocab, ablation="full", gate_prior_weight=None, interaction_skip=False,
+                 gate_variant="legacy"):
         super().__init__()
+        if ablation not in {"full", "no_interaction", "no_site", "shared_gate", "early_fusion"}:
+            raise ValueError(f"Unknown architecture ablation: {ablation}")
+        if interaction_skip and ablation in {"no_interaction", "early_fusion"}:
+            raise ValueError("interaction_skip needs the cross-level interaction and the gated path.")
+        if gate_variant not in cfg.V3_GATE_VARIANTS:
+            raise ValueError(f"Unknown gate variant: {gate_variant}")
+        if gate_variant != "legacy" and ablation == "early_fusion":
+            raise ValueError("Gate variants require a gated fusion path.")
+        self.ablation = ablation
+        self.gate_variant = gate_variant
+        self.interaction_skip = interaction_skip
         d = cfg.VIEW_DIM
 
         # ── Encoders ──────────────────────────────────────────────────────────
@@ -58,10 +70,22 @@ class TGMVMTGFNetV2(nn.Module):
             num_gate_inputs= cfg.NUM_GATE_INPUTS,   # 5 views + 1 interaction
             gate_input_dim = d,
             total_view_dim = d * cfg.NUM_VIEWS,     # for early MLP
+            ablation       = ablation,
+            gate_variant   = gate_variant,
         )
+        for gate in self.fusion.gates:
+            gate.prior_weight = cfg.GATE_PRIOR_WEIGHT if gate_prior_weight is None else gate_prior_weight
 
         # ── Output heads ──────────────────────────────────────────────────────
         self.heads = nn.ModuleList([OutputHead(d) for _ in range(cfg.NUM_TASKS)])
+
+        # ── Optional direct interaction skip (m2g_net_v3, MATHEMATICAL_FORMULAS.md §6) ─
+        # logit_k += s_k^T h_int, zero-initialised so training starts from the plain model.
+        self.skip_heads = None
+        if interaction_skip:
+            self.skip_heads = nn.ModuleList([nn.Linear(cfg.INTERACTION_DIM, 1, bias=False) for _ in range(cfg.NUM_TASKS)])
+            for skip in self.skip_heads:
+                nn.init.zeros_(skip.weight)
 
     def forward(self, views, use_site_intercept=True):
         """
@@ -70,7 +94,7 @@ class TGMVMTGFNetV2(nn.Module):
         returns:
           predictions  : list of (batch,) tensors
           gate_weights : list of (batch, num_gate_inputs) tensors per task
-          alpha_blend  : scalar — ratio of gated vs early fusion
+          alpha_blend  : scalar or (num_tasks,) — gated vs early fusion ratios
         """
         # ── Encode each view ──────────────────────────────────────────────────
         h_role  = self.encoders["rider_role"](views["rider_role"])
@@ -79,18 +103,25 @@ class TGMVMTGFNetV2(nn.Module):
         h_env   = self.encoders["environment"](views["environment"])
         h_site  = self.encoders["site"](views["site_obs"], views["site_id"],
                                         use_intercept=use_site_intercept)
+        if self.ablation == "no_site":
+            h_site = torch.zeros_like(h_site)
 
         # ── Cross-level interaction ───────────────────────────────────────────
         h_ind  = torch.cat([h_role, h_trait],       dim=-1)   # Individual
         h_ctx  = torch.cat([h_road, h_env, h_site], dim=-1)   # Contextual
-        h_inter = self.interaction(h_ind, h_ctx)
+        h_inter = self.interaction(h_ind, h_ctx) if self.ablation != "no_interaction" else None
 
         # ── Gated fusion ──────────────────────────────────────────────────────
         view_reps_5 = [h_role, h_trait, h_road, h_env, h_site]
         fused, gate_weights, alpha_blend = self.fusion(view_reps_5, h_inter)
 
         # ── Output heads ──────────────────────────────────────────────────────
-        predictions = [self.heads[k](fused[k]) for k in range(cfg.NUM_TASKS)]
+        if self.skip_heads is None:
+            predictions = [self.heads[k](fused[k]) for k in range(cfg.NUM_TASKS)]
+        else:
+            predictions = [torch.sigmoid(self.heads[k].head[0](fused[k]).squeeze(-1)
+                                         + self.skip_heads[k](h_inter).squeeze(-1))
+                           for k in range(cfg.NUM_TASKS)]
 
         return predictions, gate_weights, alpha_blend
 
@@ -132,4 +163,4 @@ if __name__ == "__main__":
     preds, gates, alpha = model(views)
     print("Predictions:", [p.shape for p in preds])
     print("Gate weights:", [g.shape for g in gates])
-    print("Alpha blend:", alpha.item())
+    print("Alpha blend:", alpha.detach().tolist())

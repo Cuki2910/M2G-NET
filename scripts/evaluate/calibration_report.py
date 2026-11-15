@@ -210,35 +210,6 @@ def generate_ece_report(all_targets, all_probs, all_masks):
     return ece_values, macro_ece
 
 
-def compare_with_baselines():
-    """
-    Compare ECE with baseline models (from previous runs).
-    """
-    print("\n" + "="*80)
-    print("  ECE COMPARISON WITH BASELINES")
-    print("="*80)
-
-    # These values are from the baseline runs
-    baseline_eces = {
-        "Decision Tree": 0.0172,
-        "Logistic Regression": 0.0113,
-        "Random Forest": 0.0693,
-        "XGBoost": 0.0818,
-        "LightGBM": 0.0221,
-        "Early-Fusion MLP": 0.0151,
-        "Single-Task MLP": 0.0215,
-    }
-
-    print(f"\n{'Model':<25} {'Macro ECE':>12} {'Calibration Quality':>25}")
-    print("-"*80)
-
-    for model, ece in sorted(baseline_eces.items(), key=lambda x: x[1]):
-        quality = "Excellent" if ece < 0.05 else "Good" if ece < 0.10 else "Moderate" if ece < 0.15 else "Poor"
-        print(f"{model:<25} {ece:>12.4f} {quality:>25}")
-
-    print("\n" + "="*80)
-
-
 if __name__ == "__main__":
     # Load model and data
     bundle = load_model_bundle()
@@ -251,13 +222,13 @@ if __name__ == "__main__":
     all_probs, all_targets, all_masks = [], [], []
     with torch.no_grad():
         for views, targets, masks in test_loader:
-            preds, _, _ = model(views)
+            preds, _, _ = model(views, use_site_intercept=bundle["test_use_site_intercept"])
             probs = torch.stack(preds, dim=1).numpy()
             all_probs.append(probs)
             all_targets.append(targets.numpy())
             all_masks.append(masks.numpy())
 
-    all_probs = np.vstack(all_probs)
+    all_probs = bundle["calibrator"].transform(np.vstack(all_probs))
     all_targets = np.vstack(all_targets)
     all_masks = np.vstack(all_masks)
 
@@ -268,8 +239,6 @@ if __name__ == "__main__":
     plot_calibration_curves(all_targets, all_probs, all_masks)
     plot_reliability_diagram(all_targets, all_probs, all_masks)
 
-    # Compare with baselines
-    compare_with_baselines()
 
     print(f"\nTG-MVMT-GFNet v2 Macro ECE: {macro_ece:.4f}")
     print("\nCalibration analysis complete.")

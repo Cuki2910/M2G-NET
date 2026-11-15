@@ -1,0 +1,2038 @@
+{
+  "version": 1,
+  "objective": "Prepare an evidence-backed OIC simulation-methods full paper, one bounded task per chat",
+  "deadline_author_confirmed": "2026-10-16",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "updated_at": "2026-10-16T09:56:15+07:00",
+  "current_task": "P29",
+  "last_handoff": "docs/paper/task-notes/P28.md",
+  "execution_authorization": "2026-10-15: user 'cứ tiếp tục liên tục, tự duyệt' authorizes serial task execution and delegated technical design approval. Retain per-task checkpoints, no fabricated evidence or author identities, no agents/commits/uploads/submissions. This is not organizer approval or verified empirical provenance. Serial repeated P13 units are authorized in this continuous goal, preserving an acceptance checkpoint after each.",
+  "tasks": {
+    "P00": {
+      "status": "done",
+      "outputs": [
+        "docs/PAPER_TASKS.md",
+        "docs/PAPER_TASK_STATE.json",
+        "docs/paper/task-notes/P00.md"
+      ],
+      "summary": "Task queue and independent resume state created; no experiment or manuscript section executed."
+    },
+    "P01": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/venue.md",
+        "docs/paper/task-notes/P01.md"
+      ],
+      "summary": "Venue audit accepted for continued paper preparation after the author's explicit confirmation and request for P02. Preserve author-confirmed 2026-10-16; organizer-written extension, submission details, and AI-disclosure policy remain unverified. This does not authorize submission.",
+      "author_confirmation": "2026-10-15: user wrote 'tôi xác nhận, làm PO2'; interpreted as author confirmation to continue with P02, not independent organizer verification.",
+      "unresolved_requirements": [
+        "Organizer-written extension and applicable submission/revision stage, publication/thematic track, cutoff time/timezone, and authorized submission route remain unverified.",
+        "Applicable organizer/publisher AI-disclosure policy remains unknown."
+      ],
+      "next_task": "P02"
+    },
+    "P02": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/scope.md",
+        "docs/paper/task-notes/P02.md"
+      ],
+      "summary": "Set one bounded simulation research question, three conditional contributions, exclusions, and claim-to-comparison map C0-C5. No winning result or novelty assumed. P01 preparation dependency accepted on author confirmation while organizer details remain unverified. Scope, state, handoff, whitespace, and preserved-hash checks passed; P03 not started.",
+      "next_task": "P03"
+    },
+    "P03": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/literature-gating.md",
+        "docs/paper/references-gating.bib",
+        "docs/paper/task-notes/P03.md"
+      ],
+      "summary": "Four primary-source identities and bounded claim support verified. DOI validator: 4 valid, 0 errors/warnings/duplicates; git diff --check passed. MMoE support explicitly limited to author-page abstract; no unverified novelty claim.",
+      "next_task": "P04"
+    },
+    "P04": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/literature-masking.md",
+        "docs/paper/references-masking.bib",
+        "docs/paper/task-notes/P04.md"
+      ],
+      "summary": "Verified PLE masked loss, Rubin ignorability, DCN interactions, and uncertainty weighting. Corrected Kendall/Gal/Cipolla author order against primary CVPR PDF. Validator: 4 valid, 0 errors/warnings/duplicates; git diff --check passed. No invented missingness-identification or benefit claim.",
+      "next_task": "P05"
+    },
+    "P05": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/literature-context.md",
+        "docs/paper/references-context.bib",
+        "docs/paper/task-notes/P05.md"
+      ],
+      "summary": "Verified primary transport motivation/eligibility and ADEMP simulation reporting. Data access not inferred; generator replicates separated from training seeds. Validator: 2 valid, 0 errors/warnings/duplicates; git diff --check passed.",
+      "next_task": "P06"
+    },
+    "P06": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/references.bib",
+        "docs/paper/claim-sources.md",
+        "docs/paper/reference-validation.json",
+        "docs/paper/references-method.bib",
+        "docs/paper/task-notes/P06.md"
+      ],
+      "summary": "Canonical bibliography amended during P16 with primary sparsemax/focal attribution: 11 unique entries, 10 DOI identities plus PMLR publisher URL. C0-C5 support and no-novelty boundaries retained. Reopened/reran validation: 11 valid, 0 errors/duplicates, 1 explained pages recommendation for article identifier 107762; no supplied DOI unresolved. Runnable bibliography/claim-map and whitespace checks passed.",
+      "next_task": "P07"
+    },
+    "P07": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/method-audit.md",
+        "docs/paper/task-notes/P07.md"
+      ],
+      "summary": "Read-only code/equation trace completed. Recorded actual focal objective, affine maps, scheduled temperature, smoothed sparsemax, site unknown handling and inactive ablation parameters. Runnable synthetic-tensor checks passed for all five architecture variants and masked NaNs; no training or architecture edit.",
+      "next_task": "P08"
+    },
+    "P08": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/protocol-draft.md",
+        "docs/paper/task-notes/P08.md"
+      ],
+      "summary": "Specified mechanisms, procedure references, budget-matching ceilings, eligible-population estimand/oracle scoring, isolation, undefined metrics and independent-replicate aggregation. Draft one-prior budget and isolated-sharing withdrawal require design confirmation before freeze. CLI/help and draft acceptance/whitespace checks passed; no experiment launched.",
+      "next_task": "P09"
+    },
+    "P09": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/generator-spec.md",
+        "docs/paper/task-notes/P09.md"
+      ],
+      "summary": "Specification and P08 one-prior budget / withdrawal of isolated task-sharing claim accepted by technical self-review under explicit user delegation. Fixed coefficients, eligible-population scoring, seed separation and oracle isolation retained; no performance claim.",
+      "next_task": "P10",
+      "design_approval": {
+        "authority": "User delegated technical approval: cứ tiếp tục liên tục, tự duyệt",
+        "date": "2026-10-15",
+        "scope": "generator-spec.md; P08 prior 0.1 and isolated-sharing withdrawal",
+        "review": "No outcome-based tuning; bounded MAR observation, fixed sites and explicit eligibility; comparisons remain procedure-level."
+      }
+    },
+    "P10": {
+      "status": "done",
+      "outputs": [
+        "scripts/generate_paper_simulation.py",
+        "tests/test_paper_generator.py",
+        "docs/paper/task-notes/P10.md"
+      ],
+      "summary": "Approved generator implemented; deterministic, isolated oracle/masks, failure/collision checks. 4 generator and 48 full tests passed (50 subtests). Historical invalid CSV preserved; final seeds untouched.",
+      "next_task": "P11"
+    },
+    "P11": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/pilot.md",
+        "docs/paper/pilot-timing.json",
+        "docs/paper/pilot-schema-audit.json",
+        "outputs/paper-development-1601-partial",
+        "outputs/paper-pilot-1601-m2g-42",
+        "docs/paper/task-notes/P11.md"
+      ],
+      "summary": "Development-only strict-schema pilot complete: 14.14651s, selected epoch 21; all splits/complete-case subsets have both classes. No final seeds accessed. Retain 150 atomic fits and 150/20 neural budget; 35.37min planning proxy is not measured matrix cost.",
+      "next_task": "P12"
+    },
+    "P12": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/protocol.md",
+        "docs/paper/run-plan.json",
+        "scripts/run_paper_unit.py",
+        "docs/paper/task-notes/P12.md"
+      ],
+      "summary": "Frozen before final generation: 9 datasets, 150 unique serial atomic units, exact commands/budgets/source hashes. No cuts; config batch size 64 verified. Unit driver executes one ID with checkpoint/acceptance checks. All final paths absent at freeze; Cartesian/uniqueness/source checks passed.",
+      "next_task": "P13"
+    },
+    "P13": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/run-plan.json",
+        "docs/paper/run-logs",
+        "docs/paper/task-notes/P13-*.md"
+      ],
+      "summary": "150/150 frozen units accepted; no aggregate endpoint inspected.",
+      "next_task": "P14"
+    },
+    "P14": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/results.csv",
+        "docs/paper/results-summary.csv",
+        "docs/paper/paired-deltas.csv",
+        "docs/paper/paired-summary.csv",
+        "docs/paper/fit-budgets.csv",
+        "docs/paper/split-counts.csv",
+        "docs/paper/aggregation-manifest.json",
+        "docs/paper/results-notes.md",
+        "docs/paper/task-notes/P14.md",
+        "scripts/summarize_paper_results.py",
+        "tests/test_paper_scoring.py",
+        "tests/test_paper_execution.py"
+      ],
+      "summary": "All 150 units isolated-scored: 750 unit/task endpoints, no undefined AUC or missing fit. Eligible-oracle joins and artifact/source integrity verified; generator versus training-seed variation separated. Mixed module effects, complete-case contrast confounded. 3 scoring/execution tests and math structural checks pass. Metadata candidate count corrected before acceptance; initial aggregation preserved.",
+      "next_task": "P15"
+    },
+    "P15": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/tables.md",
+        "docs/paper/number-audit.md",
+        "docs/paper/number-audit.json",
+        "scripts/audit_paper_numbers.py",
+        "docs/paper/task-notes/P15.md"
+      ],
+      "summary": "Independent 600 rank-AUC/Brier reconstructions match within 3.33e-16; 150 macro endpoints, 125 result-summary and 110 paired-summary rows, 660 paired deltas verified. Five numbered tables retain negative comparisons, counts and budgets. No pilot/historical evidence.",
+      "next_task": "P17"
+    },
+    "P16": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/sections/03-method.md",
+        "docs/paper/references-method.bib",
+        "docs/paper/task-notes/P16.md"
+      ],
+      "summary": "Drafted accurate Method with all affine maps, smoothed sparsemax, scheduled temperature, focal/masked surrogate, site/ablation caveats and primary algorithm attribution. Source-key/content checks and reopened bibliography/P19 checks passed. No performance or completed-fit claim.",
+      "next_task": "P24"
+    },
+    "P17": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/sections/04-evaluation.md",
+        "docs/paper/task-notes/P17.md"
+      ],
+      "summary": "Reproducible Evaluation drafted from frozen artifacts: full generator law, masks/oracle, splits, exact budgets, raw eligible endpoints and seed hierarchy; procedure/confounding limits explicit. Citation/content/dependency checks passed.",
+      "next_task": "P20"
+    },
+    "P18": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/sections/01-introduction.md",
+        "docs/paper/task-notes/P18.md"
+      ],
+      "summary": "Drafted Introduction with source-supported motivation/prior art, one research question, conditional contributions and synthetic-only limits. Citation keys and handoff/whitespace checks passed; final results unclaimed. Selected ready writing dependency while P09 awaits confirmation.",
+      "next_task": "P19"
+    },
+    "P19": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/sections/02-related-work.md",
+        "docs/paper/task-notes/P19.md"
+      ],
+      "summary": "Drafted source-supported Related Work with reading limits/component overlap; amended/rechecked for original sparsemax/focal references added during P16. All 11 canonical keys resolve and support is bounded; no uniqueness, prediction or empirical access claim.",
+      "next_task": "P16"
+    },
+    "P20": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/sections/05-results.md",
+        "docs/paper/task-notes/P20.md"
+      ],
+      "summary": "Results drafted with all 150 fits, eligible denominators, additive losses, mixed small module effects, per-task negatives, comparator Brier advantages and confounded complete-case gains. Every six-decimal prose value matches audited summaries; no significance/external claim.",
+      "next_task": "P21"
+    },
+    "P21": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/sections/06-discussion.md",
+        "docs/paper/task-notes/P21.md"
+      ],
+      "summary": "Bounded Discussion answers no general module advantage; complete-case selection and probability-quality caveats, replication/site/generator/objective limits explicit. No empirical/policy/causal inference. Dependency/citation checks passed.",
+      "next_task": "P22"
+    },
+    "P22": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/sections/07-conclusion.md",
+        "docs/paper/task-notes/P22.md"
+      ],
+      "summary": "Conclusion matches mixed results and confounded complete-case contrast; no new finding, causal/policy/empirical claim. Synthetic fixed-site limits retained.",
+      "next_task": "P23"
+    },
+    "P23": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/sections/00-frontmatter.md",
+        "docs/paper/task-notes/P23.md"
+      ],
+      "summary": "Final title, 340-word abstract (verified 300-500 window), six keywords. Actual synthetic findings, mixed module directions, complete-case and fixed-site limits explicit. Number/dependency checks passed.",
+      "next_task": "P25"
+    },
+    "P24": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/figures/architecture.svg",
+        "docs/paper/figures/architecture.png",
+        "docs/paper/task-notes/P24.md"
+      ],
+      "summary": "Created accurate self-contained architecture SVG and 1280x920 PNG preview; native render visually inspected, clipped Quick Look attempt replaced and arrowheads verified. SVG/PNG/content/whitespace checks passed; no author identifiers or performance claim.",
+      "next_task": "P09"
+    },
+    "P25": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/manuscript.md",
+        "docs/paper/references-apa.md",
+        "docs/paper/citation-map.json",
+        "docs/paper/citation-audit.md",
+        "docs/paper/manuscript-citation-validation.json",
+        "scripts/assemble_paper.py",
+        "docs/paper/task-notes/P25.md"
+      ],
+      "summary": "Eight sections, five tables, one figure, APA reference draft assembled under 8000 source words. Eleven references all used/resolved; sentence-support/primary-reading ceilings audited. Stale draft completion language fixed. Official rules rechecked; release unknowns retained, no submission authorized.",
+      "next_task": "P26"
+    },
+    "P26": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/review.md",
+        "docs/paper/task-notes/P26-review.md",
+        "docs/paper/task-notes/P26-R01.md",
+        "docs/paper/task-notes/P26-R02.md"
+      ],
+      "summary": "Internal six-tier review completed, not independent peer review. R01 measured environment/truthful availability fixed; R02 independent tie-aware AP matches all 600 task endpoints. Tables unchanged; 51 full tests/50 subtests passed. Replication/confounding/originality and external release ceilings remain explicit.",
+      "next_task": "P27"
+    },
+    "P27": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/submission/OICManuscriptFile.docx",
+        "scripts/build_paper_docx.py",
+        "tests/test_paper_document.py",
+        "docs/paper/word-render-failure.json",
+        "docs/paper/word-render-audit.json",
+        "docs/paper/rendered/libreoffice-04/OICManuscriptFile.pdf",
+        "docs/paper/rendered/libreoffice-04/render-command.json",
+        "docs/paper/rendered/libreoffice-04/text-preservation.json",
+        "docs/paper/rendered/libreoffice-04/pages/page-map.json",
+        "docs/paper/rendered/libreoffice-04/inspect-pdf.swift",
+        "docs/paper/task-notes/P27.md"
+      ],
+      "summary": "Accepted blinded template-based DOCX after default-package-namespace compatibility fix and table-cell formatting correction. Independent bounded LibreOffice render: 32 pages, all inspected; 773 text paragraphs/cells preserved, zero off-page characters, 13 equation images, architecture and five tables readable. Four document/render tests pass; 6577 body XML words, 484 numeric table tokens and 11 citations/references preserved. Incoming copies, original templates, manuscript, source/protocol and older empirical state unchanged. Microsoft Word-specific pagination remains unverified; no upload or P28/P29 execution.",
+      "completed_at": "2026-10-16T09:42:31+07:00",
+      "next_task": "P28"
+    },
+    "P28": {
+      "status": "done",
+      "outputs": [
+        "docs/paper/submission/OICTitleFile.docx",
+        "docs/paper/rendered/title-01/OICTitleFile.pdf",
+        "docs/paper/rendered/title-01/render-command.json",
+        "docs/paper/rendered/title-01/pages/page-map.json",
+        "docs/paper/rendered/title-01/pages/page-01.png",
+        "tests/test_paper_document.py",
+        "docs/paper/task-notes/P28.md"
+      ],
+      "started_at": "2026-10-16T09:46:58+07:00",
+      "checked_at": "2026-10-16T09:54:37+07:00",
+      "completed_at": "2026-10-16T09:54:37+07:00",
+      "summary": "Separate template-based title DOCX accepted with one exact user-supplied author, affiliation and email; sole author is corresponding contact. No inferred university, city or country. Research Article selected as preparation category, not organizer approval. Original styles/theme preserved; inherited example identities, stale 2024 headers/footers and unrelated metadata omitted from copy. One-page LibreOffice PDF visually inspected, exact identity text preserved, zero off-page characters; six document tests passed. Original templates, blinded manuscript, source manuscript and older empirical state hashes unchanged. P29 selected but not started; no upload/commit.",
+      "author_input": {
+        "name": "Đặng Tuấn Kiệt",
+        "affiliation": "Smart Green Transformation Center (Green-X)",
+        "email": "25kiet.dt@vinuni.edu.vn",
+        "author_count": 1,
+        "source": "User message, 2026-10-16; exact supplied spelling and single-author confirmation.",
+        "corresponding_author": "Sole author; inferred role, not an additional identity."
+      },
+      "next_task": "P29"
+    },
+    "P29": {
+      "status": "in_progress",
+      "outputs": [],
+      "started_at": "2026-10-16T09:56:15+07:00",
+      "summary": "P27/P28 dependencies done. Author confirmed P29 execution. Audit final two Word copies, embedded package content, render/evidence freshness and venue release ceilings only; no upload/submission."
+    }
+  },
+  "run_units": [
+    {
+      "id": "additive-g1701-t42-m2g_net",
+      "output": "outputs/paper-final/units/additive-g1701-t42-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:26:52.635868+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t42-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t42-m2g_net.md"
+      ],
+      "wall_seconds": 11.797228875017026
+    },
+    {
+      "id": "additive-g1701-t42-no_interaction",
+      "output": "outputs/paper-final/units/additive-g1701-t42-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:27:19.827992+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t42-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t42-no_interaction.md"
+      ],
+      "wall_seconds": 13.172335999988718
+    },
+    {
+      "id": "additive-g1701-t42-shared_gate",
+      "output": "outputs/paper-final/units/additive-g1701-t42-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:27:36.104654+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t42-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t42-shared_gate.md"
+      ],
+      "wall_seconds": 11.388066707993858
+    },
+    {
+      "id": "additive-g1701-t42-early_fusion",
+      "output": "outputs/paper-final/units/additive-g1701-t42-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:27:49.770853+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t42-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t42-early_fusion.md"
+      ],
+      "wall_seconds": 13.027518832997885
+    },
+    {
+      "id": "additive-g1701-t42-single_task_mlp",
+      "output": "outputs/paper-final/units/additive-g1701-t42-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:28:05.768392+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t42-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t42-single_task_mlp.md"
+      ],
+      "wall_seconds": 5.22806679198402
+    },
+    {
+      "id": "additive-g1701-t42-early_fusion_mlp",
+      "output": "outputs/paper-final/units/additive-g1701-t42-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:28:12.975345+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t42-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t42-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 5.142135709000286
+    },
+    {
+      "id": "additive-g1701-t42-logistic_regression",
+      "output": "outputs/paper-final/units/additive-g1701-t42-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:28:20.484649+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t42-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t42-logistic_regression.md"
+      ],
+      "wall_seconds": 2.854968875006307
+    },
+    {
+      "id": "additive-g1701-t42-catboost",
+      "output": "outputs/paper-final/units/additive-g1701-t42-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:28:23.840442+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t42-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t42-catboost.md"
+      ],
+      "wall_seconds": 5.238440417015227
+    },
+    {
+      "id": "additive-g1701-t101-m2g_net",
+      "output": "outputs/paper-final/units/additive-g1701-t101-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:28:29.611622+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t101-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t101-m2g_net.md"
+      ],
+      "wall_seconds": 13.860261624999112
+    },
+    {
+      "id": "additive-g1701-t101-no_interaction",
+      "output": "outputs/paper-final/units/additive-g1701-t101-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:28:46.700351+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t101-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t101-no_interaction.md"
+      ],
+      "wall_seconds": 10.889719041995704
+    },
+    {
+      "id": "additive-g1701-t101-shared_gate",
+      "output": "outputs/paper-final/units/additive-g1701-t101-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:29:00.571546+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t101-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t101-shared_gate.md"
+      ],
+      "wall_seconds": 11.209340375004103
+    },
+    {
+      "id": "additive-g1701-t101-early_fusion",
+      "output": "outputs/paper-final/units/additive-g1701-t101-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:29:15.157137+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t101-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t101-early_fusion.md"
+      ],
+      "wall_seconds": 10.156570332997944
+    },
+    {
+      "id": "additive-g1701-t101-single_task_mlp",
+      "output": "outputs/paper-final/units/additive-g1701-t101-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:29:28.255125+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t101-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t101-single_task_mlp.md"
+      ],
+      "wall_seconds": 5.405330875015352
+    },
+    {
+      "id": "additive-g1701-t101-early_fusion_mlp",
+      "output": "outputs/paper-final/units/additive-g1701-t101-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:29:35.656773+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t101-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t101-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 5.147502790990984
+    },
+    {
+      "id": "additive-g1701-t101-logistic_regression",
+      "output": "outputs/paper-final/units/additive-g1701-t101-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:29:43.219364+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t101-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t101-logistic_regression.md"
+      ],
+      "wall_seconds": 2.7756346249952912
+    },
+    {
+      "id": "additive-g1701-t101-catboost",
+      "output": "outputs/paper-final/units/additive-g1701-t101-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:29:46.514743+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1701-t101-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1701-t101-catboost.md"
+      ],
+      "wall_seconds": 5.230240208999021
+    },
+    {
+      "id": "additive-g1702-t42-m2g_net",
+      "output": "outputs/paper-final/units/additive-g1702-t42-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:29:52.278179+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t42-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t42-m2g_net.md"
+      ],
+      "wall_seconds": 13.118979457998648
+    },
+    {
+      "id": "additive-g1702-t42-no_interaction",
+      "output": "outputs/paper-final/units/additive-g1702-t42-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:30:10.405070+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t42-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t42-no_interaction.md"
+      ],
+      "wall_seconds": 12.169235833978746
+    },
+    {
+      "id": "additive-g1702-t42-shared_gate",
+      "output": "outputs/paper-final/units/additive-g1702-t42-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:30:25.671304+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t42-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t42-shared_gate.md"
+      ],
+      "wall_seconds": 13.663565333001316
+    },
+    {
+      "id": "additive-g1702-t42-early_fusion",
+      "output": "outputs/paper-final/units/additive-g1702-t42-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:30:42.891205+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t42-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t42-early_fusion.md"
+      ],
+      "wall_seconds": 12.21807283401722
+    },
+    {
+      "id": "additive-g1702-t42-single_task_mlp",
+      "output": "outputs/paper-final/units/additive-g1702-t42-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:30:58.025560+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t42-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t42-single_task_mlp.md"
+      ],
+      "wall_seconds": 5.351942875015084
+    },
+    {
+      "id": "additive-g1702-t42-early_fusion_mlp",
+      "output": "outputs/paper-final/units/additive-g1702-t42-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:31:05.428781+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t42-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t42-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 5.401805834000697
+    },
+    {
+      "id": "additive-g1702-t42-logistic_regression",
+      "output": "outputs/paper-final/units/additive-g1702-t42-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:31:13.202634+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t42-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t42-logistic_regression.md"
+      ],
+      "wall_seconds": 2.8065553749911487
+    },
+    {
+      "id": "additive-g1702-t42-catboost",
+      "output": "outputs/paper-final/units/additive-g1702-t42-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:31:16.685059+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t42-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t42-catboost.md"
+      ],
+      "wall_seconds": 5.268904874974396
+    },
+    {
+      "id": "additive-g1702-t101-m2g_net",
+      "output": "outputs/paper-final/units/additive-g1702-t101-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:31:22.517802+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t101-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t101-m2g_net.md"
+      ],
+      "wall_seconds": 14.035667624993948
+    },
+    {
+      "id": "additive-g1702-t101-no_interaction",
+      "output": "outputs/paper-final/units/additive-g1702-t101-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:31:39.765156+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t101-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t101-no_interaction.md"
+      ],
+      "wall_seconds": 15.292292375001125
+    },
+    {
+      "id": "additive-g1702-t101-shared_gate",
+      "output": "outputs/paper-final/units/additive-g1702-t101-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:31:58.812655+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t101-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t101-shared_gate.md"
+      ],
+      "wall_seconds": 18.609751292009605
+    },
+    {
+      "id": "additive-g1702-t101-early_fusion",
+      "output": "outputs/paper-final/units/additive-g1702-t101-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:32:20.237007+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t101-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t101-early_fusion.md"
+      ],
+      "wall_seconds": 16.12598224999965
+    },
+    {
+      "id": "additive-g1702-t101-single_task_mlp",
+      "output": "outputs/paper-final/units/additive-g1702-t101-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:32:39.860578+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t101-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t101-single_task_mlp.md"
+      ],
+      "wall_seconds": 6.991017499996815
+    },
+    {
+      "id": "additive-g1702-t101-early_fusion_mlp",
+      "output": "outputs/paper-final/units/additive-g1702-t101-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:32:49.676532+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t101-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t101-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 4.646333874989068
+    },
+    {
+      "id": "additive-g1702-t101-logistic_regression",
+      "output": "outputs/paper-final/units/additive-g1702-t101-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:32:56.528269+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t101-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t101-logistic_regression.md"
+      ],
+      "wall_seconds": 2.7980505419836845
+    },
+    {
+      "id": "additive-g1702-t101-catboost",
+      "output": "outputs/paper-final/units/additive-g1702-t101-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:32:59.985812+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1702-t101-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1702-t101-catboost.md"
+      ],
+      "wall_seconds": 5.028825499990489
+    },
+    {
+      "id": "additive-g1703-t42-m2g_net",
+      "output": "outputs/paper-final/units/additive-g1703-t42-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:33:05.538995+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t42-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t42-m2g_net.md"
+      ],
+      "wall_seconds": 12.491085167013807
+    },
+    {
+      "id": "additive-g1703-t42-no_interaction",
+      "output": "outputs/paper-final/units/additive-g1703-t42-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:33:22.987686+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t42-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t42-no_interaction.md"
+      ],
+      "wall_seconds": 9.608819832996232
+    },
+    {
+      "id": "additive-g1703-t42-shared_gate",
+      "output": "outputs/paper-final/units/additive-g1703-t42-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:33:35.392150+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t42-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t42-shared_gate.md"
+      ],
+      "wall_seconds": 16.538955166004598
+    },
+    {
+      "id": "additive-g1703-t42-early_fusion",
+      "output": "outputs/paper-final/units/additive-g1703-t42-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:33:54.770408+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t42-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t42-early_fusion.md"
+      ],
+      "wall_seconds": 8.668393333005952
+    },
+    {
+      "id": "additive-g1703-t42-single_task_mlp",
+      "output": "outputs/paper-final/units/additive-g1703-t42-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:34:06.295404+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t42-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t42-single_task_mlp.md"
+      ],
+      "wall_seconds": 5.207581458991626
+    },
+    {
+      "id": "additive-g1703-t42-early_fusion_mlp",
+      "output": "outputs/paper-final/units/additive-g1703-t42-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:34:13.478675+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t42-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t42-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 5.075973125000019
+    },
+    {
+      "id": "additive-g1703-t42-logistic_regression",
+      "output": "outputs/paper-final/units/additive-g1703-t42-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:34:20.863225+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t42-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t42-logistic_regression.md"
+      ],
+      "wall_seconds": 2.7471005419793073
+    },
+    {
+      "id": "additive-g1703-t42-catboost",
+      "output": "outputs/paper-final/units/additive-g1703-t42-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:34:24.172176+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t42-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t42-catboost.md"
+      ],
+      "wall_seconds": 5.576162042008946
+    },
+    {
+      "id": "additive-g1703-t101-m2g_net",
+      "output": "outputs/paper-final/units/additive-g1703-t101-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:34:30.367939+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t101-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t101-m2g_net.md"
+      ],
+      "wall_seconds": 11.045547582994914
+    },
+    {
+      "id": "additive-g1703-t101-no_interaction",
+      "output": "outputs/paper-final/units/additive-g1703-t101-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:34:43.723573+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t101-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t101-no_interaction.md"
+      ],
+      "wall_seconds": 13.02633891600999
+    },
+    {
+      "id": "additive-g1703-t101-shared_gate",
+      "output": "outputs/paper-final/units/additive-g1703-t101-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:34:59.638283+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t101-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t101-shared_gate.md"
+      ],
+      "wall_seconds": 15.871851792006055
+    },
+    {
+      "id": "additive-g1703-t101-early_fusion",
+      "output": "outputs/paper-final/units/additive-g1703-t101-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:35:18.576033+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t101-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t101-early_fusion.md"
+      ],
+      "wall_seconds": 8.730767708009807
+    },
+    {
+      "id": "additive-g1703-t101-single_task_mlp",
+      "output": "outputs/paper-final/units/additive-g1703-t101-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:35:30.523058+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t101-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t101-single_task_mlp.md"
+      ],
+      "wall_seconds": 6.027387707988964
+    },
+    {
+      "id": "additive-g1703-t101-early_fusion_mlp",
+      "output": "outputs/paper-final/units/additive-g1703-t101-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:35:38.819197+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t101-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t101-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 6.546877542015864
+    },
+    {
+      "id": "additive-g1703-t101-logistic_regression",
+      "output": "outputs/paper-final/units/additive-g1703-t101-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:35:47.991605+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t101-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t101-logistic_regression.md"
+      ],
+      "wall_seconds": 3.171259499998996
+    },
+    {
+      "id": "additive-g1703-t101-catboost",
+      "output": "outputs/paper-final/units/additive-g1703-t101-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:35:51.833774+00:00",
+      "outputs": [
+        "outputs/paper-final/units/additive-g1703-t101-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-additive-g1703-t101-catboost.md"
+      ],
+      "wall_seconds": 5.844194083008915
+    },
+    {
+      "id": "interaction-g1701-t42-m2g_net",
+      "output": "outputs/paper-final/units/interaction-g1701-t42-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:35:58.387097+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t42-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t42-m2g_net.md"
+      ],
+      "wall_seconds": 20.305384084000252
+    },
+    {
+      "id": "interaction-g1701-t42-no_interaction",
+      "output": "outputs/paper-final/units/interaction-g1701-t42-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:36:25.659721+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t42-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t42-no_interaction.md"
+      ],
+      "wall_seconds": 16.175194334005937
+    },
+    {
+      "id": "interaction-g1701-t42-shared_gate",
+      "output": "outputs/paper-final/units/interaction-g1701-t42-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:36:45.454249+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t42-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t42-shared_gate.md"
+      ],
+      "wall_seconds": 21.384937249997165
+    },
+    {
+      "id": "interaction-g1701-t42-early_fusion",
+      "output": "outputs/paper-final/units/interaction-g1701-t42-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:37:11.221961+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t42-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t42-early_fusion.md"
+      ],
+      "wall_seconds": 11.998500749992672
+    },
+    {
+      "id": "interaction-g1701-t42-single_task_mlp",
+      "output": "outputs/paper-final/units/interaction-g1701-t42-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:37:26.547643+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t42-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t42-single_task_mlp.md"
+      ],
+      "wall_seconds": 6.349276124994503
+    },
+    {
+      "id": "interaction-g1701-t42-early_fusion_mlp",
+      "output": "outputs/paper-final/units/interaction-g1701-t42-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:37:35.233772+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t42-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t42-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 7.047169458004646
+    },
+    {
+      "id": "interaction-g1701-t42-logistic_regression",
+      "output": "outputs/paper-final/units/interaction-g1701-t42-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:37:45.018284+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t42-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t42-logistic_regression.md"
+      ],
+      "wall_seconds": 3.0258834170235787
+    },
+    {
+      "id": "interaction-g1701-t42-catboost",
+      "output": "outputs/paper-final/units/interaction-g1701-t42-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:37:48.687525+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t42-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t42-catboost.md"
+      ],
+      "wall_seconds": 5.769454916007817
+    },
+    {
+      "id": "interaction-g1701-t101-m2g_net",
+      "output": "outputs/paper-final/units/interaction-g1701-t101-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:37:55.413400+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t101-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t101-m2g_net.md"
+      ],
+      "wall_seconds": 16.03119495799183
+    },
+    {
+      "id": "interaction-g1701-t101-no_interaction",
+      "output": "outputs/paper-final/units/interaction-g1701-t101-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:38:15.070871+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t101-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t101-no_interaction.md"
+      ],
+      "wall_seconds": 12.54689587498433
+    },
+    {
+      "id": "interaction-g1701-t101-shared_gate",
+      "output": "outputs/paper-final/units/interaction-g1701-t101-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:38:30.656845+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t101-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t101-shared_gate.md"
+      ],
+      "wall_seconds": 22.929739166022046
+    },
+    {
+      "id": "interaction-g1701-t101-early_fusion",
+      "output": "outputs/paper-final/units/interaction-g1701-t101-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:38:56.652031+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t101-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t101-early_fusion.md"
+      ],
+      "wall_seconds": 11.489775416004704
+    },
+    {
+      "id": "interaction-g1701-t101-single_task_mlp",
+      "output": "outputs/paper-final/units/interaction-g1701-t101-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:39:11.373570+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t101-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t101-single_task_mlp.md"
+      ],
+      "wall_seconds": 6.383920583000872
+    },
+    {
+      "id": "interaction-g1701-t101-early_fusion_mlp",
+      "output": "outputs/paper-final/units/interaction-g1701-t101-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:39:20.272202+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t101-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t101-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 6.068757999979425
+    },
+    {
+      "id": "interaction-g1701-t101-logistic_regression",
+      "output": "outputs/paper-final/units/interaction-g1701-t101-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:39:28.794141+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t101-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t101-logistic_regression.md"
+      ],
+      "wall_seconds": 2.8718244160118047
+    },
+    {
+      "id": "interaction-g1701-t101-catboost",
+      "output": "outputs/paper-final/units/interaction-g1701-t101-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:39:32.323732+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1701-t101-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1701-t101-catboost.md"
+      ],
+      "wall_seconds": 5.615882083016913
+    },
+    {
+      "id": "interaction-g1702-t42-m2g_net",
+      "output": "outputs/paper-final/units/interaction-g1702-t42-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:39:38.624269+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t42-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t42-m2g_net.md"
+      ],
+      "wall_seconds": 14.948057834000792
+    },
+    {
+      "id": "interaction-g1702-t42-no_interaction",
+      "output": "outputs/paper-final/units/interaction-g1702-t42-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:39:58.955595+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t42-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t42-no_interaction.md"
+      ],
+      "wall_seconds": 10.971126707998337
+    },
+    {
+      "id": "interaction-g1702-t42-shared_gate",
+      "output": "outputs/paper-final/units/interaction-g1702-t42-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:40:13.362030+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t42-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t42-shared_gate.md"
+      ],
+      "wall_seconds": 19.7246577909973
+    },
+    {
+      "id": "interaction-g1702-t42-early_fusion",
+      "output": "outputs/paper-final/units/interaction-g1702-t42-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:40:36.503784+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t42-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t42-early_fusion.md"
+      ],
+      "wall_seconds": 13.79236345802201
+    },
+    {
+      "id": "interaction-g1702-t42-single_task_mlp",
+      "output": "outputs/paper-final/units/interaction-g1702-t42-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:40:53.402031+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t42-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t42-single_task_mlp.md"
+      ],
+      "wall_seconds": 6.815926750015933
+    },
+    {
+      "id": "interaction-g1702-t42-early_fusion_mlp",
+      "output": "outputs/paper-final/units/interaction-g1702-t42-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:41:02.512246+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t42-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t42-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 6.284676209004829
+    },
+    {
+      "id": "interaction-g1702-t42-logistic_regression",
+      "output": "outputs/paper-final/units/interaction-g1702-t42-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:41:11.092382+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t42-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t42-logistic_regression.md"
+      ],
+      "wall_seconds": 2.8477001250139438
+    },
+    {
+      "id": "interaction-g1702-t42-catboost",
+      "output": "outputs/paper-final/units/interaction-g1702-t42-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:41:14.520775+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t42-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t42-catboost.md"
+      ],
+      "wall_seconds": 5.123460709000938
+    },
+    {
+      "id": "interaction-g1702-t101-m2g_net",
+      "output": "outputs/paper-final/units/interaction-g1702-t101-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:41:20.164502+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t101-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t101-m2g_net.md"
+      ],
+      "wall_seconds": 14.214136750000762
+    },
+    {
+      "id": "interaction-g1702-t101-no_interaction",
+      "output": "outputs/paper-final/units/interaction-g1702-t101-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:41:37.473336+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t101-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t101-no_interaction.md"
+      ],
+      "wall_seconds": 15.552752666000742
+    },
+    {
+      "id": "interaction-g1702-t101-shared_gate",
+      "output": "outputs/paper-final/units/interaction-g1702-t101-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:41:56.603082+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t101-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t101-shared_gate.md"
+      ],
+      "wall_seconds": 17.206732708000345
+    },
+    {
+      "id": "interaction-g1702-t101-early_fusion",
+      "output": "outputs/paper-final/units/interaction-g1702-t101-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:42:16.998147+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t101-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t101-early_fusion.md"
+      ],
+      "wall_seconds": 12.444831917004194
+    },
+    {
+      "id": "interaction-g1702-t101-single_task_mlp",
+      "output": "outputs/paper-final/units/interaction-g1702-t101-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:42:32.384961+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t101-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t101-single_task_mlp.md"
+      ],
+      "wall_seconds": 6.184758125018561
+    },
+    {
+      "id": "interaction-g1702-t101-early_fusion_mlp",
+      "output": "outputs/paper-final/units/interaction-g1702-t101-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:42:40.799450+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t101-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t101-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 6.969947792007588
+    },
+    {
+      "id": "interaction-g1702-t101-logistic_regression",
+      "output": "outputs/paper-final/units/interaction-g1702-t101-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:42:50.227054+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t101-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t101-logistic_regression.md"
+      ],
+      "wall_seconds": 3.0583554999902844
+    },
+    {
+      "id": "interaction-g1702-t101-catboost",
+      "output": "outputs/paper-final/units/interaction-g1702-t101-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:42:53.828585+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1702-t101-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1702-t101-catboost.md"
+      ],
+      "wall_seconds": 5.399082249990897
+    },
+    {
+      "id": "interaction-g1703-t42-m2g_net",
+      "output": "outputs/paper-final/units/interaction-g1703-t42-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:42:59.770597+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t42-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t42-m2g_net.md"
+      ],
+      "wall_seconds": 12.992670417006593
+    },
+    {
+      "id": "interaction-g1703-t42-no_interaction",
+      "output": "outputs/paper-final/units/interaction-g1703-t42-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:43:18.109414+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t42-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t42-no_interaction.md"
+      ],
+      "wall_seconds": 10.50007095898036
+    },
+    {
+      "id": "interaction-g1703-t42-shared_gate",
+      "output": "outputs/paper-final/units/interaction-g1703-t42-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:43:31.664545+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t42-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t42-shared_gate.md"
+      ],
+      "wall_seconds": 15.24164741698769
+    },
+    {
+      "id": "interaction-g1703-t42-early_fusion",
+      "output": "outputs/paper-final/units/interaction-g1703-t42-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:43:49.952384+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t42-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t42-early_fusion.md"
+      ],
+      "wall_seconds": 9.089040791004663
+    },
+    {
+      "id": "interaction-g1703-t42-single_task_mlp",
+      "output": "outputs/paper-final/units/interaction-g1703-t42-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:44:02.146890+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t42-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t42-single_task_mlp.md"
+      ],
+      "wall_seconds": 7.171744541003136
+    },
+    {
+      "id": "interaction-g1703-t42-early_fusion_mlp",
+      "output": "outputs/paper-final/units/interaction-g1703-t42-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:44:12.180775+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t42-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t42-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 6.389110499992967
+    },
+    {
+      "id": "interaction-g1703-t42-logistic_regression",
+      "output": "outputs/paper-final/units/interaction-g1703-t42-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:44:20.999822+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t42-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t42-logistic_regression.md"
+      ],
+      "wall_seconds": 3.6848398330039345
+    },
+    {
+      "id": "interaction-g1703-t42-catboost",
+      "output": "outputs/paper-final/units/interaction-g1703-t42-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:44:25.327225+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t42-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t42-catboost.md"
+      ],
+      "wall_seconds": 4.841739249997772
+    },
+    {
+      "id": "interaction-g1703-t101-m2g_net",
+      "output": "outputs/paper-final/units/interaction-g1703-t101-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:44:30.860425+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t101-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t101-m2g_net.md"
+      ],
+      "wall_seconds": 14.011403458018322
+    },
+    {
+      "id": "interaction-g1703-t101-no_interaction",
+      "output": "outputs/paper-final/units/interaction-g1703-t101-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:44:48.120127+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t101-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t101-no_interaction.md"
+      ],
+      "wall_seconds": 18.982850000000326
+    },
+    {
+      "id": "interaction-g1703-t101-shared_gate",
+      "output": "outputs/paper-final/units/interaction-g1703-t101-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:45:10.297766+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t101-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t101-shared_gate.md"
+      ],
+      "wall_seconds": 18.629263374983566
+    },
+    {
+      "id": "interaction-g1703-t101-early_fusion",
+      "output": "outputs/paper-final/units/interaction-g1703-t101-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:45:31.963832+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t101-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t101-early_fusion.md"
+      ],
+      "wall_seconds": 12.322035459015751
+    },
+    {
+      "id": "interaction-g1703-t101-single_task_mlp",
+      "output": "outputs/paper-final/units/interaction-g1703-t101-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:45:47.304845+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t101-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t101-single_task_mlp.md"
+      ],
+      "wall_seconds": 6.7049934590177145
+    },
+    {
+      "id": "interaction-g1703-t101-early_fusion_mlp",
+      "output": "outputs/paper-final/units/interaction-g1703-t101-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:45:56.264296+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t101-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t101-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 6.838993165991269
+    },
+    {
+      "id": "interaction-g1703-t101-logistic_regression",
+      "output": "outputs/paper-final/units/interaction-g1703-t101-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:46:05.600373+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t101-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t101-logistic_regression.md"
+      ],
+      "wall_seconds": 3.0104555829893798
+    },
+    {
+      "id": "interaction-g1703-t101-catboost",
+      "output": "outputs/paper-final/units/interaction-g1703-t101-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:46:09.165654+00:00",
+      "outputs": [
+        "outputs/paper-final/units/interaction-g1703-t101-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-interaction-g1703-t101-catboost.md"
+      ],
+      "wall_seconds": 5.556692458019825
+    },
+    {
+      "id": "partial-g1701-t42-m2g_net",
+      "output": "outputs/paper-final/units/partial-g1701-t42-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:46:15.398577+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t42-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t42-m2g_net.md"
+      ],
+      "wall_seconds": 17.14140612501069
+    },
+    {
+      "id": "partial-g1701-t42-no_interaction",
+      "output": "outputs/paper-final/units/partial-g1701-t42-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:46:37.909580+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t42-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t42-no_interaction.md"
+      ],
+      "wall_seconds": 12.317288500024006
+    },
+    {
+      "id": "partial-g1701-t42-shared_gate",
+      "output": "outputs/paper-final/units/partial-g1701-t42-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:46:53.350090+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t42-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t42-shared_gate.md"
+      ],
+      "wall_seconds": 17.646740374999354
+    },
+    {
+      "id": "partial-g1701-t42-early_fusion",
+      "output": "outputs/paper-final/units/partial-g1701-t42-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:47:14.243998+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t42-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t42-early_fusion.md"
+      ],
+      "wall_seconds": 18.43265179201262
+    },
+    {
+      "id": "partial-g1701-t42-single_task_mlp",
+      "output": "outputs/paper-final/units/partial-g1701-t42-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:47:35.880724+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t42-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t42-single_task_mlp.md"
+      ],
+      "wall_seconds": 7.316116207977757
+    },
+    {
+      "id": "partial-g1701-t42-early_fusion_mlp",
+      "output": "outputs/paper-final/units/partial-g1701-t42-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:47:46.227523+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t42-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t42-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 7.682572499994421
+    },
+    {
+      "id": "partial-g1701-t42-logistic_regression",
+      "output": "outputs/paper-final/units/partial-g1701-t42-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:47:56.872285+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t42-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t42-logistic_regression.md"
+      ],
+      "wall_seconds": 3.811456791998353
+    },
+    {
+      "id": "partial-g1701-t42-catboost",
+      "output": "outputs/paper-final/units/partial-g1701-t42-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:48:01.323464+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t42-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t42-catboost.md"
+      ],
+      "wall_seconds": 4.929915832995903
+    },
+    {
+      "id": "partial-g1701-t42-complete_case",
+      "output": "outputs/paper-final/units/partial-g1701-t42-complete_case",
+      "status": "done",
+      "started_at": "2026-10-15T15:48:07.117966+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t42-complete_case/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t42-complete_case.md"
+      ],
+      "wall_seconds": 9.327252499992028
+    },
+    {
+      "id": "partial-g1701-t101-m2g_net",
+      "output": "outputs/paper-final/units/partial-g1701-t101-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:48:18.883595+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t101-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t101-m2g_net.md"
+      ],
+      "wall_seconds": 14.540257333021145
+    },
+    {
+      "id": "partial-g1701-t101-no_interaction",
+      "output": "outputs/paper-final/units/partial-g1701-t101-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:48:36.981654+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t101-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t101-no_interaction.md"
+      ],
+      "wall_seconds": 17.122595999971963
+    },
+    {
+      "id": "partial-g1701-t101-shared_gate",
+      "output": "outputs/paper-final/units/partial-g1701-t101-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:48:57.250974+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t101-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t101-shared_gate.md"
+      ],
+      "wall_seconds": 13.13481270801276
+    },
+    {
+      "id": "partial-g1701-t101-early_fusion",
+      "output": "outputs/paper-final/units/partial-g1701-t101-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:49:13.661102+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t101-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t101-early_fusion.md"
+      ],
+      "wall_seconds": 11.323837875010213
+    },
+    {
+      "id": "partial-g1701-t101-single_task_mlp",
+      "output": "outputs/paper-final/units/partial-g1701-t101-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:49:28.192658+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t101-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t101-single_task_mlp.md"
+      ],
+      "wall_seconds": 7.2196826659783255
+    },
+    {
+      "id": "partial-g1701-t101-early_fusion_mlp",
+      "output": "outputs/paper-final/units/partial-g1701-t101-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:49:38.132548+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t101-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t101-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 6.030415584013099
+    },
+    {
+      "id": "partial-g1701-t101-logistic_regression",
+      "output": "outputs/paper-final/units/partial-g1701-t101-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:49:46.551185+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t101-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t101-logistic_regression.md"
+      ],
+      "wall_seconds": 3.3689960409828927
+    },
+    {
+      "id": "partial-g1701-t101-catboost",
+      "output": "outputs/paper-final/units/partial-g1701-t101-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:49:50.434827+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t101-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t101-catboost.md"
+      ],
+      "wall_seconds": 4.419173833011882
+    },
+    {
+      "id": "partial-g1701-t101-complete_case",
+      "output": "outputs/paper-final/units/partial-g1701-t101-complete_case",
+      "status": "done",
+      "started_at": "2026-10-15T15:49:55.353727+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1701-t101-complete_case/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1701-t101-complete_case.md"
+      ],
+      "wall_seconds": 8.8045798339881
+    },
+    {
+      "id": "partial-g1702-t42-m2g_net",
+      "output": "outputs/paper-final/units/partial-g1702-t42-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:50:07.160784+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t42-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t42-m2g_net.md"
+      ],
+      "wall_seconds": 15.647258958983002
+    },
+    {
+      "id": "partial-g1702-t42-no_interaction",
+      "output": "outputs/paper-final/units/partial-g1702-t42-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:50:27.788097+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t42-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t42-no_interaction.md"
+      ],
+      "wall_seconds": 12.97471083397977
+    },
+    {
+      "id": "partial-g1702-t42-shared_gate",
+      "output": "outputs/paper-final/units/partial-g1702-t42-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:50:43.699535+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t42-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t42-shared_gate.md"
+      ],
+      "wall_seconds": 13.0485708329943
+    },
+    {
+      "id": "partial-g1702-t42-early_fusion",
+      "output": "outputs/paper-final/units/partial-g1702-t42-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:50:59.735046+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t42-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t42-early_fusion.md"
+      ],
+      "wall_seconds": 16.209266417019535
+    },
+    {
+      "id": "partial-g1702-t42-single_task_mlp",
+      "output": "outputs/paper-final/units/partial-g1702-t42-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:51:19.157249+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t42-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t42-single_task_mlp.md"
+      ],
+      "wall_seconds": 7.533906374999788
+    },
+    {
+      "id": "partial-g1702-t42-early_fusion_mlp",
+      "output": "outputs/paper-final/units/partial-g1702-t42-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:51:29.687090+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t42-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t42-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 6.1704868329979945
+    },
+    {
+      "id": "partial-g1702-t42-logistic_regression",
+      "output": "outputs/paper-final/units/partial-g1702-t42-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:51:38.410089+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t42-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t42-logistic_regression.md"
+      ],
+      "wall_seconds": 4.315668499999447
+    },
+    {
+      "id": "partial-g1702-t42-catboost",
+      "output": "outputs/paper-final/units/partial-g1702-t42-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:51:43.549138+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t42-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t42-catboost.md"
+      ],
+      "wall_seconds": 5.69378037500428
+    },
+    {
+      "id": "partial-g1702-t42-complete_case",
+      "output": "outputs/paper-final/units/partial-g1702-t42-complete_case",
+      "status": "done",
+      "started_at": "2026-10-15T15:51:49.953890+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t42-complete_case/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t42-complete_case.md"
+      ],
+      "wall_seconds": 8.637332334008534
+    },
+    {
+      "id": "partial-g1702-t101-m2g_net",
+      "output": "outputs/paper-final/units/partial-g1702-t101-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:52:01.328531+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t101-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t101-m2g_net.md"
+      ],
+      "wall_seconds": 16.324898999999277
+    },
+    {
+      "id": "partial-g1702-t101-no_interaction",
+      "output": "outputs/paper-final/units/partial-g1702-t101-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:52:21.179901+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t101-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t101-no_interaction.md"
+      ],
+      "wall_seconds": 14.584643374982988
+    },
+    {
+      "id": "partial-g1702-t101-shared_gate",
+      "output": "outputs/paper-final/units/partial-g1702-t101-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:52:39.798932+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t101-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t101-shared_gate.md"
+      ],
+      "wall_seconds": 16.6288320000167
+    },
+    {
+      "id": "partial-g1702-t101-early_fusion",
+      "output": "outputs/paper-final/units/partial-g1702-t101-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:53:00.500832+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t101-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t101-early_fusion.md"
+      ],
+      "wall_seconds": 14.007208166993223
+    },
+    {
+      "id": "partial-g1702-t101-single_task_mlp",
+      "output": "outputs/paper-final/units/partial-g1702-t101-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:53:17.519394+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t101-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t101-single_task_mlp.md"
+      ],
+      "wall_seconds": 7.223536834004335
+    },
+    {
+      "id": "partial-g1702-t101-early_fusion_mlp",
+      "output": "outputs/paper-final/units/partial-g1702-t101-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:53:27.907592+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t101-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t101-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 7.493901540990919
+    },
+    {
+      "id": "partial-g1702-t101-logistic_regression",
+      "output": "outputs/paper-final/units/partial-g1702-t101-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:53:38.418448+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t101-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t101-logistic_regression.md"
+      ],
+      "wall_seconds": 3.6209428340080194
+    },
+    {
+      "id": "partial-g1702-t101-catboost",
+      "output": "outputs/paper-final/units/partial-g1702-t101-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:53:42.647107+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t101-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t101-catboost.md"
+      ],
+      "wall_seconds": 4.670691041974351
+    },
+    {
+      "id": "partial-g1702-t101-complete_case",
+      "output": "outputs/paper-final/units/partial-g1702-t101-complete_case",
+      "status": "done",
+      "started_at": "2026-10-15T15:53:48.032236+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1702-t101-complete_case/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1702-t101-complete_case.md"
+      ],
+      "wall_seconds": 11.898712249996606
+    },
+    {
+      "id": "partial-g1703-t42-m2g_net",
+      "output": "outputs/paper-final/units/partial-g1703-t42-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:54:02.847665+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t42-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t42-m2g_net.md"
+      ],
+      "wall_seconds": 10.975730833015405
+    },
+    {
+      "id": "partial-g1703-t42-no_interaction",
+      "output": "outputs/paper-final/units/partial-g1703-t42-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:54:18.801055+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t42-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t42-no_interaction.md"
+      ],
+      "wall_seconds": 10.101144707994536
+    },
+    {
+      "id": "partial-g1703-t42-shared_gate",
+      "output": "outputs/paper-final/units/partial-g1703-t42-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:54:31.771659+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t42-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t42-shared_gate.md"
+      ],
+      "wall_seconds": 13.967322334006894
+    },
+    {
+      "id": "partial-g1703-t42-early_fusion",
+      "output": "outputs/paper-final/units/partial-g1703-t42-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:54:48.750548+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t42-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t42-early_fusion.md"
+      ],
+      "wall_seconds": 10.877221542003099
+    },
+    {
+      "id": "partial-g1703-t42-single_task_mlp",
+      "output": "outputs/paper-final/units/partial-g1703-t42-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:55:02.644124+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t42-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t42-single_task_mlp.md"
+      ],
+      "wall_seconds": 6.29368308300036
+    },
+    {
+      "id": "partial-g1703-t42-early_fusion_mlp",
+      "output": "outputs/paper-final/units/partial-g1703-t42-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:55:11.207109+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t42-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t42-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 6.020738041988807
+    },
+    {
+      "id": "partial-g1703-t42-logistic_regression",
+      "output": "outputs/paper-final/units/partial-g1703-t42-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:55:19.702499+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t42-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t42-logistic_regression.md"
+      ],
+      "wall_seconds": 2.911385749990586
+    },
+    {
+      "id": "partial-g1703-t42-catboost",
+      "output": "outputs/paper-final/units/partial-g1703-t42-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:55:23.273887+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t42-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t42-catboost.md"
+      ],
+      "wall_seconds": 5.303022042004159
+    },
+    {
+      "id": "partial-g1703-t42-complete_case",
+      "output": "outputs/paper-final/units/partial-g1703-t42-complete_case",
+      "status": "done",
+      "started_at": "2026-10-15T15:55:29.141250+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t42-complete_case/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t42-complete_case.md"
+      ],
+      "wall_seconds": 7.762079084001016
+    },
+    {
+      "id": "partial-g1703-t101-m2g_net",
+      "output": "outputs/paper-final/units/partial-g1703-t101-m2g_net",
+      "status": "done",
+      "started_at": "2026-10-15T15:55:39.986588+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t101-m2g_net/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t101-m2g_net.md"
+      ],
+      "wall_seconds": 14.645567750005284
+    },
+    {
+      "id": "partial-g1703-t101-no_interaction",
+      "output": "outputs/paper-final/units/partial-g1703-t101-no_interaction",
+      "status": "done",
+      "started_at": "2026-10-15T15:55:57.756946+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t101-no_interaction/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t101-no_interaction.md"
+      ],
+      "wall_seconds": 12.847796291986015
+    },
+    {
+      "id": "partial-g1703-t101-shared_gate",
+      "output": "outputs/paper-final/units/partial-g1703-t101-shared_gate",
+      "status": "done",
+      "started_at": "2026-10-15T15:56:13.675836+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t101-shared_gate/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t101-shared_gate.md"
+      ],
+      "wall_seconds": 13.805517000000691
+    },
+    {
+      "id": "partial-g1703-t101-early_fusion",
+      "output": "outputs/paper-final/units/partial-g1703-t101-early_fusion",
+      "status": "done",
+      "started_at": "2026-10-15T15:56:30.464790+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t101-early_fusion/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t101-early_fusion.md"
+      ],
+      "wall_seconds": 14.480010375002166
+    },
+    {
+      "id": "partial-g1703-t101-single_task_mlp",
+      "output": "outputs/paper-final/units/partial-g1703-t101-single_task_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:56:47.933313+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t101-single_task_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t101-single_task_mlp.md"
+      ],
+      "wall_seconds": 5.6675769169814885
+    },
+    {
+      "id": "partial-g1703-t101-early_fusion_mlp",
+      "output": "outputs/paper-final/units/partial-g1703-t101-early_fusion_mlp",
+      "status": "done",
+      "started_at": "2026-10-15T15:56:55.481336+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t101-early_fusion_mlp/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t101-early_fusion_mlp.md"
+      ],
+      "wall_seconds": 6.148165833001258
+    },
+    {
+      "id": "partial-g1703-t101-logistic_regression",
+      "output": "outputs/paper-final/units/partial-g1703-t101-logistic_regression",
+      "status": "done",
+      "started_at": "2026-10-15T15:57:04.029502+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t101-logistic_regression/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t101-logistic_regression.md"
+      ],
+      "wall_seconds": 2.7387186250125524
+    },
+    {
+      "id": "partial-g1703-t101-catboost",
+      "output": "outputs/paper-final/units/partial-g1703-t101-catboost",
+      "status": "done",
+      "started_at": "2026-10-15T15:57:07.290259+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t101-catboost/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t101-catboost.md"
+      ],
+      "wall_seconds": 4.963340083981166
+    },
+    {
+      "id": "partial-g1703-t101-complete_case",
+      "output": "outputs/paper-final/units/partial-g1703-t101-complete_case",
+      "status": "done",
+      "started_at": "2026-10-15T15:57:12.783649+00:00",
+      "outputs": [
+        "outputs/paper-final/units/partial-g1703-t101-complete_case/paper-unit.json",
+        "docs/paper/task-notes/P13-partial-g1703-t101-complete_case.md"
+      ],
+      "wall_seconds": 9.851400499988813
+    }
+  ],
+  "review_findings": [
+    {
+      "id": "R01",
+      "status": "done",
+      "severity": "major reporting",
+      "summary": "Measured environment and honest code/data availability missing from manuscript.",
+      "outputs": [
+        "docs/paper/task-notes/P26-R01.md"
+      ]
+    },
+    {
+      "id": "R02",
+      "status": "done",
+      "severity": "moderate audit",
+      "summary": "Independently reconstruct secondary AP including tied scores.",
+      "outputs": [
+        "docs/paper/task-notes/P26-R02.md"
+      ]
+    }
+  ],
+  "context_summary": {
+    "plan": "docs/PAPER_TASKS.md",
+    "design_proposal": "docs/superpowers/specs/2026-10-15-oic-simulation-design.md",
+    "writing_workflow": "docs/PAPER_WRITING_WORKFLOW.md",
+    "templates": "docs/template/",
+    "key_decisions": [
+      "One chat executes one task or one repeated unit, then stops.",
+      "Use OIC Word templates; preserve originals and existing worktree changes.",
+      "Simulation design is proposed; no completed main experiment is implied.",
+      "Preserve the older blocked empirical state at .claude/pipeline-state.json.",
+      "No fabricated citations, findings, author identities, or observational provenance.",
+      "No commits, uploads, author correspondence, or submissions without authorization."
+    ]
+  }
+}

@@ -68,9 +68,11 @@ def tau_report(loss_fn):
 
 
 def alpha_report(model):
-    alpha = torch.sigmoid(model.fusion.alpha_logit).item()
-    print(f"\n=== Alpha Blend ===")
-    print(f"  alpha={alpha:.4f}  (1=pure gated fusion, 0=pure early fusion)")
+    alpha = torch.sigmoid(model.fusion.alpha_logit).detach().reshape(-1).tolist()
+    print("\n=== Alpha Blend (1=pure gated, 0=pure early) ===")
+    names = cfg.TASK_NAMES if len(alpha) > 1 else ["shared"]
+    for task, value in zip(names, alpha):
+        print(f"  {task}: alpha={value:.4f}")
 
 
 if __name__ == "__main__":

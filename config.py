@@ -8,6 +8,7 @@ RANDOM_SEED = 42
 TEST_SIZE   = 0.20
 VAL_SIZE    = 0.10
 DATA_PATH   = "data/raw/synthetic_rider_data.csv"
+LABEL_POLICY = "strict"
 
 # ── Column Mapping ─────────────────────────────────────────────────────────────
 INDIVIDUAL_VIEW_COLS = {
@@ -43,9 +44,9 @@ TASK_DISPLAY_NAMES = {
 # Optional task-observation masks for partially observed labels.
 # A mask column should be 1 when the corresponding task label is genuinely
 # observable for that row, and 0 when the task is not applicable or missing.
-# If these columns are absent in the CSV, the data pipeline defaults to all
-# labels observed to preserve backward compatibility with the current
-# synthetic proof-of-concept data.
+# Missing labels are unobserved. Red-light labels require a signalized site.
+# Strict mode rejects contradictory positives; explicit "mask" mode excludes
+# inapplicable labels without rewriting the source CSV.
 TASK_MASK_COLS = {
     "red_light_running": "red_light_running_observed",
     "no_turn_signal": "no_turn_signal_observed",
@@ -82,6 +83,32 @@ USE_POS_WEIGHT             = False
 USE_FOCAL_LOSS            = True
 FOCAL_ALPHA               = 0.25
 FOCAL_GAMMA               = 2.0
+
+# ── m2g_net_v3 (docs/paper/extension-v3/PLAN.md) ──────────────────────────────
+V3_USE_FOCAL_LOSS      = False   # BCE is a proper scoring rule; focal shrinks probabilities
+V3_ENSEMBLE_SIZE       = 5       # members averaged in probability space
+V3_MEMBER_SEED_OFFSET  = 1000    # member m trains with seed + m * offset
+V3_INTERACTION_SKIP    = False   # direct h_int -> logit skip (see docs/paper/extension-v3/ARCH-DEV.md)
+V3_GATE_VARIANT        = "legacy"
+V3_GATE_VARIANTS       = ("legacy", "nonlinear", "task_blend", "nonlinear_task_blend")
+V3_GATE_HIDDEN_DIM     = HIDDEN_DIM
+V3_DEV_MECHANISMS      = ("additive", "interaction", "partial")
+V3_DEV_GENERATOR_SEEDS = tuple(range(1701, 1711))
+V3_DEV_TRAINING_SEEDS  = (42, 101)
+V3_DEV_SPLIT_SEED      = RANDOM_SEED
+V3_DEV_WORKERS         = 4
+V3_DEV_ROOT            = "outputs/paper-v3-gate-dev"
+V3_DEV_REPORT_ROOT     = "docs/paper/extension-v3/gate-search"
+V3_DEV_FINAL_DATA_ROOT = "outputs/paper-final"
+V3_DEV_EXTENSION_DATA_ROOT = "outputs/paper-extension"
+V3_DEV_FINAL_LAST_SEED = 1703
+V3_DEV_OPPONENTS       = ("m2g_net", "shared_gate", "no_interaction", "early_fusion",
+                          "single_task_mlp", "early_fusion_mlp", "logistic_regression", "catboost")
+V3_DEV_AUC_POSITIVE_FRACTION = 0.9
+V3_DEV_AUC_MIN_DELTA    = 0.005
+V3_DIAGNOSTIC_ROOT     = "outputs/paper-v3-diagnostics"
+V3_DIAGNOSTIC_REPORT_ROOT = "docs/paper/extension-v3/diagnostics"
+V3_DECAY_VARIANTS     = {"wd_base": WEIGHT_DECAY, "wd_strong": 1e-3}
 
 # ── Num Tasks / Views ─────────────────────────────────────────────────────────
 NUM_TASKS = len(TASK_NAMES)

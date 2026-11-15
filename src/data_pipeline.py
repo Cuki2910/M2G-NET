@@ -19,6 +19,52 @@ import config as cfg
 
 UNKNOWN_CATEGORY = "__UNK__"
 
+def prepare_labels(df, label_policy="strict", require_masks=False):
+    """Validate raw records and materialize binary observation masks in memory."""
+    if label_policy not in {"strict", "mask"}:
+        raise ValueError("label_policy must be 'strict' or 'mask'.")
+    df = df.copy()
+    feature_cols = [col for cols in cfg.INDIVIDUAL_VIEW_COLS.values() for col in cols]
+    feature_cols += [col for cols in cfg.CONTEXTUAL_VIEW_COLS.values() for col in cols]
+    required = feature_cols + [cfg.SITE_ID_COL] + cfg.TARGET_COLS
+    missing = sorted(set(required) - set(df.columns))
+    if missing:
+        raise ValueError(f"Missing required columns: {missing}")
+    if df.empty or df[feature_cols + [cfg.SITE_ID_COL]].isna().any().any():
+        raise ValueError("Records must be nonempty; missing feature/site values need an explicit imputation policy.")
+    site_ids = pd.to_numeric(df[cfg.SITE_ID_COL], errors="raise")
+    if not np.isfinite(site_ids).all() or not (site_ids == site_ids.astype(int)).all():
+        raise ValueError("Site IDs must be finite integers.")
+    df[cfg.SITE_ID_COL] = site_ids.astype(int)
+    signal_values = df["has_signal"].astype(str).str.strip().str.lower()
+    if not signal_values.isin(["yes", "no"]).all():
+        raise ValueError("Raw has_signal values must be Yes or No.")
+    for task in cfg.TASK_NAMES:
+        mask_col = cfg.TASK_MASK_COLS[task]
+        labels = pd.to_numeric(df[task], errors="raise")
+        if not labels.dropna().isin([0, 1]).all():
+            raise ValueError(f"{task}: labels must be binary or missing.")
+        if mask_col not in df:
+            if require_masks:
+                raise ValueError(f"Missing explicit observation mask: {mask_col}")
+            df[mask_col] = labels.notna().astype(int)
+        if not df[mask_col].isin([0, 1]).all():
+            raise ValueError(f"{mask_col}: masks must be binary, finite, and nonmissing.")
+        observed = df[mask_col].eq(1)
+        if (observed & labels.isna()).any():
+            raise ValueError(f"{task}: observed labels cannot be missing.")
+        if task == "red_light_running":
+            no_signal = signal_values.eq("no")
+            contradictory = no_signal & observed & labels.eq(1)
+            if contradictory.any() and label_policy == "strict":
+                raise ValueError(
+                    f"{int(contradictory.sum())} red-light positives at sites without signals. "
+                    "Correct the source or explicitly use label_policy='mask' to exclude inapplicable labels."
+                )
+            df.loc[no_signal, mask_col] = 0
+        df[task] = labels.where(df[mask_col].eq(1), 0).astype(float)
+    return df
+
 
 def _configured_categorical_cols(df):
     """Categorical feature columns that feed the model, excluding site ids."""
@@ -27,7 +73,7 @@ def _configured_categorical_cols(df):
         cols.extend(view_cols)
     for view_cols in cfg.CONTEXTUAL_VIEW_COLS.values():
         cols.extend(view_cols)
-    return [c for c in cols if c in df.columns and df[c].dtype == object]
+    return [c for c in cols if c in df.columns]
 
 
 # ── Encoding helpers ──────────────────────────────────────────────────────────
@@ -38,7 +84,7 @@ def build_encoders(df):
     encoders = {}
     for col in cat_cols:
         le = LabelEncoder()
-        values = pd.Series(df[col].dropna().unique())
+        values = pd.Series(df[col].dropna().astype(str).unique())
         le.fit(pd.concat([values, pd.Series([UNKNOWN_CATEGORY])], ignore_index=True))
         encoders[col] = le
     return encoders
@@ -49,7 +95,8 @@ def apply_encoders(df, encoders):
     for col, le in encoders.items():
         if col in df.columns:
             known = set(le.classes_)
-            values = df[col].where(df[col].isin(known), UNKNOWN_CATEGORY)
+            values = df[col].astype(str)
+            values = values.where(values.isin(known), UNKNOWN_CATEGORY)
             df[col] = le.transform(values)
     return df
 
@@ -90,15 +137,16 @@ def apply_site_mapping(df, site_mapping):
     return df
 
 
-def encode_splits(train_df, val_df, test_df):
+def encode_splits(train_df, val_df, test_df, label_policy=cfg.LABEL_POLICY):
     """Fit preprocessing on train only, then transform all splits."""
+    train_df, val_df, test_df = [prepare_labels(frame, label_policy) for frame in (train_df, val_df, test_df)]
     encoders = build_encoders(train_df)
     site_mapping = build_site_mapping(train_df)
     return encode_splits_with_preprocessing(train_df, val_df, test_df, encoders, site_mapping)
 
 
-def encode_with_preprocessing(df, encoders, site_mapping):
-    return apply_site_mapping(apply_encoders(df, encoders), site_mapping)
+def encode_with_preprocessing(df, encoders, site_mapping, label_policy=cfg.LABEL_POLICY):
+    return apply_site_mapping(apply_encoders(prepare_labels(df, label_policy), encoders), site_mapping)
 
 
 def build_vocab(encoders, site_mapping):
@@ -143,7 +191,11 @@ def extract_views(df, vocab):
 
 
 def extract_targets(df):
-    return torch.tensor(df[cfg.TARGET_COLS].values, dtype=torch.float32)
+    targets = df[cfg.TARGET_COLS].to_numpy(dtype=float)
+    masks = extract_task_masks(df).numpy().astype(bool)
+    if not np.isfinite(targets[masks]).all() or not np.isin(targets[masks], [0, 1]).all():
+        raise ValueError("Observed targets must be finite binary labels.")
+    return torch.tensor(np.where(masks, targets, 0), dtype=torch.float32)
 
 
 def extract_task_masks(df):
@@ -157,8 +209,10 @@ def extract_task_masks(df):
         if col and col in df.columns:
             mask_cols.append(df[col].astype(float).values)
         else:
-            mask_cols.append(np.ones(len(df), dtype=float))
+            mask_cols.append(df[task].notna().to_numpy(dtype=float))
     masks = np.stack(mask_cols, axis=1)
+    if not np.isin(masks, [0, 1]).all():
+        raise ValueError("Task masks must be binary and finite.")
     return torch.tensor(masks, dtype=torch.float32)
 
 
@@ -220,13 +274,21 @@ def stratified_split(df, test_size=cfg.TEST_SIZE, val_size=cfg.VAL_SIZE,
         return frame[cfg.TARGET_COLS[0]]
 
     strat_col = stratify_key(df)
-    train_df, test_df = train_test_split(
-        df, test_size=test_size, stratify=strat_col, random_state=seed)
+    if not 0 < test_size < 1 or not 0 < val_size < 1 - test_size:
+        raise ValueError("Split fractions must be positive and sum to less than one.")
+    try:
+        train_df, test_df = train_test_split(
+            df, test_size=test_size, stratify=strat_col, random_state=seed)
+    except ValueError:
+        train_df, test_df = train_test_split(df, test_size=test_size, random_state=seed)
     val_rel = val_size / (1 - test_size)
     train_strat_col = stratify_key(train_df)
-    train_df, val_df = train_test_split(
-        train_df, test_size=val_rel,
-        stratify=train_strat_col, random_state=seed)
+    try:
+        train_df, val_df = train_test_split(
+            train_df, test_size=val_rel,
+            stratify=train_strat_col, random_state=seed)
+    except ValueError:
+        train_df, val_df = train_test_split(train_df, test_size=val_rel, random_state=seed)
     return train_df.reset_index(drop=True), val_df.reset_index(drop=True), test_df.reset_index(drop=True)
 
 
@@ -244,18 +306,19 @@ def safe_train_val_split(df, val_size=cfg.VAL_SIZE, seed=cfg.RANDOM_SEED):
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
-def load_data(seed=cfg.RANDOM_SEED, data_path=cfg.DATA_PATH):
+def load_data(seed=cfg.RANDOM_SEED, data_path=cfg.DATA_PATH, label_policy=cfg.LABEL_POLICY):
     """
     Load CSV, split first, then fit preprocessing on train only.
     Returns (train_df, val_df, test_df, encoders, vocab).
     """
-    df = pd.read_csv(data_path)
-    train_df, val_df, test_df = stratified_split(df, seed=seed)
+    train_df, val_df, test_df = load_raw_splits(seed, data_path, label_policy)
     return encode_splits(train_df, val_df, test_df)
 
 
-def load_raw_splits(seed=cfg.RANDOM_SEED, data_path=cfg.DATA_PATH):
+def load_raw_splits(seed=cfg.RANDOM_SEED, data_path=cfg.DATA_PATH, label_policy=cfg.LABEL_POLICY):
     df = pd.read_csv(data_path)
+    df["_row_id"] = np.arange(len(df))
+    df = prepare_labels(df, label_policy)
     return stratified_split(df, seed=seed)
 
 

@@ -1,0 +1,12 @@
+{
+  "freeze_sha256": "78fc40064279d911ab2b41f27073057743b57119a12335f3f44ae2c64e5609f6",
+  "scorer_sha256": "ee6071cc8a7b6368a28f1f6413ac49c24cd3ced766df0a89970aeb5b3108afd5",
+  "runner_sha256": "769eb50043d98ed266bceb3cc52894d1ae7cfc40f8685effde242f934087e7c0",
+  "units": 1080,
+  "outputs": {
+    "results-locked.csv": "204aaad6dc7e0049327e8f04adeafc5b7111fe058f03562279e02db1e61b1e49",
+    "per-set-locked.csv": "1564e6021d48b3f66faaf61604c1965769a77ba2e9fa127d6eb5f9de09eed17d",
+    "criteria.csv": "9050e899b89cce6760a987cea40c4dcfc18a897a074be1e7fcd37484c6f4fd9c",
+    "summary-locked.csv": "f99742ac39e5b8f002b2b71efbd918608eb3d251dd5468b9e3e57d65bfd0557d"
+  }
+}

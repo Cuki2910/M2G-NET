@@ -45,6 +45,12 @@ class TemperatureScaler:
         """
         probs = np.asarray(probs, dtype=float)
         targets = np.asarray(targets, dtype=float)
+        if probs.shape != targets.shape:
+            raise ValueError("Calibration probabilities and targets must have the same shape.")
+        if np.isinf(targets).any():
+            raise ValueError("Calibration labels must be binary or NaN, not infinite.")
+        if (np.isfinite(targets) & ~np.isfinite(probs)).any():
+            raise ValueError("Observed calibration probabilities must be finite.")
 
         flat_probs = probs.ravel()
         flat_targets = targets.ravel()
@@ -53,6 +59,10 @@ class TemperatureScaler:
         valid = np.isfinite(flat_targets) & np.isfinite(flat_probs)
         flat_probs = flat_probs[valid]
         flat_targets = flat_targets[valid]
+        if not len(flat_targets):
+            raise ValueError("Calibration needs at least one observed validation label.")
+        if not np.isin(flat_targets, [0, 1]).all() or not ((flat_probs >= 0) & (flat_probs <= 1)).all():
+            raise ValueError("Calibration requires binary labels and probabilities in [0, 1].")
 
         # Recover pre-sigmoid logits
         flat_probs = np.clip(flat_probs, _PROB_CLIP, 1 - _PROB_CLIP)
@@ -64,12 +74,18 @@ class TemperatureScaler:
             bounds=(_T_MIN, _T_MAX),
             method="bounded",
         )
-        self.temperature = float(result.x)
+        if not result.success or not np.isfinite(result.fun):
+            raise RuntimeError("Temperature optimization failed.")
+        self.temperature = float(result.x) if result.fun <= self._nll(1.0, logits, flat_targets) else 1.0
         return self
 
     def transform(self, probs: np.ndarray) -> np.ndarray:
         """Apply temperature scaling to probability array."""
         probs = np.asarray(probs, dtype=float)
+        if not np.isfinite(self.temperature) or self.temperature <= 0:
+            raise ValueError("Temperature must be finite and positive.")
+        if not np.isfinite(probs).all() or not ((probs >= 0) & (probs <= 1)).all():
+            raise ValueError("Predicted probabilities must be finite and in [0, 1].")
         clipped = np.clip(probs, _PROB_CLIP, 1 - _PROB_CLIP)
         scaled_logits = logit(clipped) / self.temperature
         return expit(scaled_logits)
@@ -85,3 +101,19 @@ class TemperatureScaler:
         scaler = cls()
         scaler.temperature = float(data["temperature"])
         return scaler
+
+def fit_validation_rule(targets, probs, masks):
+    from src.metrics import tune_task_thresholds
+    observed = np.asarray(masks, dtype=bool)
+    scaler = TemperatureScaler().fit(
+        np.where(observed, probs, np.nan), np.where(observed, targets, np.nan))
+    thresholds = tune_task_thresholds(targets, scaler.transform(probs), masks)
+    return scaler, thresholds
+
+def prediction_metrics(targets, probs, masks, scaler, thresholds):
+    from src.metrics import compute_all_metrics
+    return {
+        "raw_default": compute_all_metrics(targets, probs, masks),
+        "calibrated_default": compute_all_metrics(targets, scaler.transform(probs), masks),
+        "calibrated_tuned": compute_all_metrics(targets, scaler.transform(probs), masks, thresholds),
+    }

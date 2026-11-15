@@ -7,6 +7,10 @@ from src.fusion import RegularizedTaskGate, sparsemax
 
 
 class GatePriorSmoothingTest(unittest.TestCase):
+    def test_scheduled_temperature_is_not_gradient_learned(self):
+        gate = RegularizedTaskGate(num_inputs=3, input_dim=2)
+        self.assertFalse(gate.temperature.requires_grad)
+
     def test_gate_prior_smoothing_matches_formula(self):
         old_prior_weight = cfg.GATE_PRIOR_WEIGHT
         cfg.GATE_PRIOR_WEIGHT = 0.1

@@ -1,5 +1,6 @@
 import os
 import sys
+import argparse
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
@@ -17,11 +18,11 @@ from src.metrics import compute_all_metrics
 os.makedirs("outputs", exist_ok=True)
 
 
-def collect_predictions(model, loader):
+def collect_predictions(model, loader, use_site_intercept=True):
     all_probs, all_targets, all_masks = [], [], []
     with torch.no_grad():
         for views, targets, masks in loader:
-            preds, _, _ = model(views)
+            preds, _, _ = model(views, use_site_intercept=use_site_intercept)
             all_probs.append(torch.stack(preds, dim=1).numpy())
             all_targets.append(targets.numpy())
             all_masks.append(masks.numpy())
@@ -48,13 +49,23 @@ def subgroup_rows(df, y, p, m, column, encoders, thresholds=None):
                 "task": task,
                 "n": int(mask.sum()),
             }
+            if task != "macro":
+                task_idx = cfg.TASK_NAMES.index(task)
+                observed = m[mask, task_idx].astype(bool)
+                row["n_observed"] = int(observed.sum())
+                row["n_positive"] = int(y[mask, task_idx][observed].sum())
             row.update(metrics[task])
             rows.append(row)
     return rows
 
 
 def main():
-    bundle = load_model_bundle()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--checkpoint", default=cfg.CHECKPOINT_PATH)
+    parser.add_argument("--output-dir", default="outputs/fairness_calibration")
+    args = parser.parse_args()
+    os.makedirs(args.output_dir, exist_ok=False)
+    bundle = load_model_bundle(args.checkpoint)
     test_df = bundle["test_df"]
     encoders = bundle["encoders"]
     vocab = bundle["vocab"]
@@ -62,7 +73,8 @@ def main():
     test_loader = DataLoader(RiderDataset(test_df, vocab), batch_size=cfg.BATCH_SIZE, shuffle=False)
     model = bundle["model"]
 
-    y, p, m = collect_predictions(model, test_loader)
+    y, p, m = collect_predictions(model, test_loader, bundle["test_use_site_intercept"])
+    p = bundle["calibrator"].transform(p)
 
     rows = []
     for column in ["gender", "age_group"]:
@@ -70,7 +82,7 @@ def main():
             rows.extend(subgroup_rows(test_df, y, p, m, column, encoders, thresholds=thresholds))
 
     result = pd.DataFrame(rows)
-    out = "outputs/fairness_calibration_by_group.csv"
+    out = os.path.join(args.output_dir, "fairness_calibration_by_group.csv")
     result.to_csv(out, index=False)
 
     overall = compute_all_metrics(y, p, m, thresholds=thresholds)
@@ -80,7 +92,7 @@ def main():
         row.update(overall[task])
         overall_rows.append(row)
     overall_df = pd.DataFrame(overall_rows)
-    overall_out = "outputs/calibration_overall.csv"
+    overall_out = os.path.join(args.output_dir, "calibration_overall.csv")
     overall_df.to_csv(overall_out, index=False)
 
     print("\n=== Overall Calibration / Performance ===")

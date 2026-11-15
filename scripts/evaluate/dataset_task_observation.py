@@ -1,5 +1,6 @@
 import os
 import sys
+import argparse
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
@@ -7,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 import config as cfg
+from src.data_pipeline import prepare_labels
 
 
 os.makedirs("outputs", exist_ok=True)
@@ -20,7 +22,12 @@ def task_mask(df, task):
 
 
 def main():
-    df = pd.read_csv(cfg.DATA_PATH)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data", default=cfg.DATA_PATH)
+    parser.add_argument("--label-policy", choices=["strict", "mask"], default=cfg.LABEL_POLICY)
+    parser.add_argument("--require-masks", action="store_true")
+    args = parser.parse_args()
+    df = prepare_labels(pd.read_csv(args.data), args.label_policy, args.require_masks)
     rows = []
 
     for task in cfg.TASK_NAMES:

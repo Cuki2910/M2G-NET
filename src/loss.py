@@ -38,13 +38,15 @@ class UncertaintyWeightedLoss(nn.Module):
     """
 
     def __init__(self, num_tasks=cfg.NUM_TASKS, use_focal=cfg.USE_FOCAL_LOSS,
-                 pos_weight=None, use_pos_weight=cfg.USE_POS_WEIGHT):
+                 pos_weight=None, use_pos_weight=cfg.USE_POS_WEIGHT,
+                 use_uncertainty=cfg.USE_UNCERTAINTY_WEIGHTING):
         super().__init__()
         # Parameterize log(tau^2) for numerical stability.
         self.log_tau_sq = nn.Parameter(torch.zeros(num_tasks))
         self.use_focal    = use_focal
         self.num_tasks    = num_tasks
         self.use_pos_weight = use_pos_weight
+        self.use_uncertainty = use_uncertainty
         if pos_weight is None:
             pos_weight = torch.ones(num_tasks, dtype=torch.float32)
         else:
@@ -84,6 +86,13 @@ class UncertaintyWeightedLoss(nn.Module):
             pred_k   = predictions[k]                                    # (batch,)
             target_k = targets[:, k]                                     # (batch,)
             mask_k   = masks[:, k]                                       # (batch,)
+            observed = mask_k.bool()
+            if not observed.any():
+                task_losses[task_name] = float("nan")
+                continue
+            pred_k = pred_k[observed]
+            target_k = target_k[observed]
+            mask_k = mask_k[observed]
 
             if self.use_focal:
                 per_sample_loss = focal_loss(pred_k, target_k)
@@ -102,8 +111,11 @@ class UncertaintyWeightedLoss(nn.Module):
                 task_losses[task_name] = float("nan")
                 continue
 
-            precision   = torch.exp(-self.log_tau_sq[k])                # 1/tau^2
-            total_loss += 0.5 * precision * loss_k + 0.5 * self.log_tau_sq[k]
+            if self.use_uncertainty:
+                precision = torch.exp(-self.log_tau_sq[k])
+                total_loss += 0.5 * precision * loss_k + 0.5 * self.log_tau_sq[k]
+            else:
+                total_loss += loss_k
             task_losses[task_name] = loss_k.item()
 
         task_losses["tau"] = torch.exp(0.5 * self.log_tau_sq).detach().tolist()

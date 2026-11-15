@@ -1,10 +1,13 @@
 torch>=2.0
 numpy
 pandas
-scikit-learn
+scikit-learn>=1.2
+scipy
+joblib
 xgboost
 lightgbm
 catboost
 matplotlib
 seaborn
 captum
+requests

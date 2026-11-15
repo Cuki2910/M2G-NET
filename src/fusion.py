@@ -33,21 +33,23 @@ def sparsemax(z, dim=-1):
 class RegularizedTaskGate(nn.Module):
     """
     One gate per task.
-    Divides logits by a learnable temperature to control attention sharpness.
+    Divides logits by a scheduled temperature to control attention sharpness.
     Applies uniform prior smoothing: alpha = (1-lam)*sparsemax(logits/T) + lam/K
-    This reduces cross-seed variance (gate instability). When lam > 0, exact
+    Cross-seed stability must be evaluated empirically. When lam > 0, exact
     sparse zeros become a positive lower bound of lam/K.
     """
 
     def __init__(self, num_inputs, input_dim,
                  temperature_init=cfg.TEMPERATURE_INIT,
-                 prior_weight=cfg.GATE_PRIOR_WEIGHT):
+                 prior_weight=cfg.GATE_PRIOR_WEIGHT, nonlinear=False):
         super().__init__()
-        self.gate         = nn.Linear(num_inputs * input_dim, num_inputs)
+        self.gate = (nn.Sequential(nn.Linear(num_inputs * input_dim, cfg.V3_GATE_HIDDEN_DIM),
+                                   nn.GELU(), nn.Linear(cfg.V3_GATE_HIDDEN_DIM, num_inputs))
+                     if nonlinear else nn.Linear(num_inputs * input_dim, num_inputs))
         # T is declared as nn.Parameter for checkpoint compatibility but is NOT
         # gradient-learned. scripts/train.py::anneal_temperature() overwrites
         # .data each epoch via cosine schedule (TEMPERATURE_INIT -> TEMPERATURE_FINAL).
-        self.temperature  = nn.Parameter(torch.tensor(float(temperature_init)))
+        self.temperature  = nn.Parameter(torch.tensor(float(temperature_init)), requires_grad=False)
         self.prior_weight = float(prior_weight)
         self.num_inputs   = num_inputs
 
@@ -88,15 +90,26 @@ class ResidualGatedFusion(nn.Module):
 
     def __init__(self, num_tasks, num_gate_inputs, gate_input_dim,
                  total_view_dim, view_dim=cfg.VIEW_DIM,
-                 dropout=cfg.DROPOUT_RATE):
+                 dropout=cfg.DROPOUT_RATE, ablation="full", gate_variant="legacy"):
         super().__init__()
+        if gate_variant not in cfg.V3_GATE_VARIANTS:
+            raise ValueError(f"Unknown gate variant: {gate_variant}")
+        if gate_variant != "legacy" and ablation == "early_fusion":
+            raise ValueError("Gate variants require a gated fusion path.")
+        self.gate_variant = gate_variant
+        self.task_blend = gate_variant in {"task_blend", "nonlinear_task_blend"}
+        self.ablation = ablation
+        self.num_tasks = num_tasks
+        if ablation in {"no_interaction", "no_site"}:
+            num_gate_inputs -= 1
         self.num_gate_inputs = num_gate_inputs
 
         # Task-specific gates (operate on 5 views + interaction = num_gate_inputs)
         self.gates = nn.ModuleList([
             RegularizedTaskGate(num_gate_inputs, gate_input_dim,
-                                prior_weight=cfg.GATE_PRIOR_WEIGHT)
-            for _ in range(num_tasks)
+                                prior_weight=cfg.GATE_PRIOR_WEIGHT,
+                                nonlinear=gate_variant in {"nonlinear", "nonlinear_task_blend"})
+            for _ in range(0 if ablation == "early_fusion" else 1 if ablation == "shared_gate" else num_tasks)
         ])
 
         # Early fusion MLP (concat of 5 original views only)
@@ -111,7 +124,7 @@ class ResidualGatedFusion(nn.Module):
         self.inter_proj = nn.Linear(cfg.INTERACTION_DIM, gate_input_dim)
 
         # Learnable blend parameter: alpha=1 → pure gated, alpha=0 → pure early
-        self.alpha_logit = nn.Parameter(torch.tensor(0.0))   # sigmoid(0) = 0.5
+        self.alpha_logit = nn.Parameter(torch.zeros(num_tasks) if self.task_blend else torch.tensor(0.0))
 
     def forward(self, view_reps_5, h_inter):
         """
@@ -120,24 +133,31 @@ class ResidualGatedFusion(nn.Module):
         returns:
           fused     : list of num_tasks tensors, each (batch, d)
           gate_weights: list of num_tasks tensors, each (batch, num_gate_inputs)
-          alpha_blend : scalar tensor (blend ratio)
+          alpha_blend : scalar tensor or (num_tasks,) for task-specific blend
         """
         # Early fusion path
         z_early = self.early_mlp(torch.cat(view_reps_5, dim=-1))   # (batch, d)
+        if self.ablation == "early_fusion":
+            return [z_early] * self.num_tasks, [], z_early.new_tensor(0.0)
 
         # Gated fusion path: gate and weighted sum both use views + interaction.
         # Project h_inter to match view dimension for uniform gate input
-        h_inter_proj = self.inter_proj(h_inter)                    # (batch, gate_input_dim)
-        gate_inputs_proj = view_reps_5 + [h_inter_proj]
+        gate_inputs_proj = list(view_reps_5)
+        if self.ablation == "no_site":
+            gate_inputs_proj = gate_inputs_proj[:-1]
+        if self.ablation != "no_interaction":
+            gate_inputs_proj.append(self.inter_proj(h_inter))
         H = torch.stack(gate_inputs_proj, dim=1)   # (batch, 6, d)
 
         alpha_blend = torch.sigmoid(self.alpha_logit)
 
         fused, gate_weights = [], []
-        for gate in self.gates:
+        for task_idx in range(self.num_tasks):
+            gate = self.gates[0 if self.ablation == "shared_gate" else task_idx]
             a = gate(gate_inputs_proj)              # (batch, num_gate_inputs)
             z_gated = (H * a.unsqueeze(-1)).sum(dim=1)   # (batch, d)
-            z = alpha_blend * z_gated + (1 - alpha_blend) * z_early
+            blend = alpha_blend[task_idx] if self.task_blend else alpha_blend
+            z = blend * z_gated + (1 - blend) * z_early
             fused.append(z)
             gate_weights.append(a)
 

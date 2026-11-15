@@ -61,7 +61,7 @@ def main():
                         help="Checkpoint to update.")
     parser.add_argument("--no-save", action="store_true",
                         help="Report tuned thresholds without writing them to checkpoint.")
-    parser.add_argument("--independent", default="data/test/independent_test_set.csv",
+    parser.add_argument("--independent", default=None,
                         help="Optional independent CSV to report after tuning.")
     args = parser.parse_args()
 
@@ -69,14 +69,16 @@ def main():
     model = bundle["model"]
     vocab = bundle["vocab"]
 
-    val_y, val_p, val_m = collect_predictions(model, bundle["val_df"], vocab)
+    val_y, val_p, val_m = collect_predictions(model, bundle["val_df"], vocab, bundle["validation_use_site_intercept"])
+    val_p = bundle["calibrator"].transform(val_p)
     thresholds = tune_task_thresholds(val_y, val_p, val_m, metric=args.metric)
 
     print("\n=== Tuned Thresholds ===")
     for task in cfg.TASK_NAMES:
         print(f"{task:<25} {thresholds[task]:.3f}")
 
-    test_y, test_p, test_m = collect_predictions(model, bundle["test_df"], vocab)
+    test_y, test_p, test_m = collect_predictions(model, bundle["test_df"], vocab, bundle["test_use_site_intercept"])
+    test_p = bundle["calibrator"].transform(test_p)
     reports = {
         "thresholds": thresholds,
         "validation_metric": args.metric,
@@ -89,9 +91,11 @@ def main():
             raw_independent,
             bundle["encoders"],
             vocab["site_mapping"],
+            label_policy=bundle["label_policy"],
         )
         ind_y, ind_p, ind_m = collect_predictions(
             model, independent_df, vocab, use_site_intercept=False)
+        ind_p = bundle["calibrator"].transform(ind_p)
         reports["independent"] = report_split(
             "Independent Test", ind_y, ind_p, ind_m, thresholds)
 

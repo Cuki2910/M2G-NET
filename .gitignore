@@ -1,4 +1,6 @@
 # Python
+.DS_Store
+._*
 __pycache__/
 *.py[cod]
 *$py.class
@@ -11,6 +13,7 @@ build/
 
 # Virtual environments
 venv/
+.venv/
 env/
 .env
 
