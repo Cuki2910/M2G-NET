@@ -59,6 +59,9 @@ python -m unittest discover -s tests            # or: pytest tests
 python scripts/generate_paper_simulation.py --seed 1711 --mechanism interaction --output outputs/demo/interaction-1711
 
 # 2. Locked test: 20 seeds x 3 mechanisms x 2 training seeds x 9 models = 1080 fits (hours; the paper reports 5 of the 9 models)
+#    Names in code -> names in the paper: m2g_net_v3 = M2G-NET, single_task_mlp = Independent MLP,
+#    early_fusion_mlp = Shared one-hot MLP, logistic_regression = Logistic regression, catboost = CatBoost.
+#    The other four labels (m2g_net, shared_gate, no_interaction, early_fusion) are run by the same protocol but not reported in the paper.
 #    Sources are checked against docs/paper/extension-v3/FREEZE.json first; any edited frozen file aborts the run.
 python scripts/run_extension_v3.py run --confirmed-locked-test --workers 4
 python scripts/run_extension_v3.py score        # writes docs/paper/extension-v3/{results,per-set,summary}-locked.csv, criteria.csv
